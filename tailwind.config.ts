@@ -47,16 +47,30 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          primary: "hsl(var(--sidebar-primary))",
-          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
-          accent: "hsl(var(--sidebar-accent))",
-          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
+        // Gaming-specific neon colors
+        neon: {
+          green: "hsl(var(--neon-green))",
+          blue: "hsl(var(--neon-blue))",
+          red: "hsl(var(--neon-red))",
+          purple: "hsl(var(--neon-purple))",
+          yellow: "hsl(var(--neon-yellow))",
         },
+      },
+      backgroundImage: {
+        "gradient-primary": "var(--gradient-primary)",
+        "gradient-danger": "var(--gradient-danger)",
+        "gradient-game": "var(--gradient-game)",
+        "gradient-neon": "var(--gradient-neon)",
+      },
+      boxShadow: {
+        "neon-green": "var(--shadow-neon-green)",
+        "neon-blue": "var(--shadow-neon-blue)",
+        "neon-red": "var(--shadow-neon-red)",
+        "game": "var(--shadow-game)",
+      },
+      transitionTimingFunction: {
+        "smooth": "var(--transition-smooth)",
+        "bounce": "var(--transition-bounce)",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -80,10 +94,52 @@ export default {
             height: "0",
           },
         },
+        "pulse-neon": {
+          "0%, 100%": {
+            boxShadow: "0 0 20px hsl(var(--neon-green) / 0.5)",
+          },
+          "50%": {
+            boxShadow: "0 0 30px hsl(var(--neon-green) / 0.8), 0 0 40px hsl(var(--neon-green) / 0.4)",
+          },
+        },
+        "glow": {
+          "0%, 100%": {
+            textShadow: "0 0 20px currentColor",
+          },
+          "50%": {
+            textShadow: "0 0 30px currentColor, 0 0 40px currentColor",
+          },
+        },
+        "bounce-scale": {
+          "0%, 100%": {
+            transform: "scale(1)",
+          },
+          "50%": {
+            transform: "scale(1.05)",
+          },
+        },
+        "crash-pulse": {
+          "0%": {
+            transform: "scale(1)",
+            boxShadow: "0 0 0 0 hsl(var(--neon-red) / 0.7)",
+          },
+          "70%": {
+            transform: "scale(1.1)",
+            boxShadow: "0 0 0 20px hsl(var(--neon-red) / 0)",
+          },
+          "100%": {
+            transform: "scale(1)",
+            boxShadow: "0 0 0 0 hsl(var(--neon-red) / 0)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "pulse-neon": "pulse-neon 2s ease-in-out infinite",
+        "glow": "glow 2s ease-in-out infinite",
+        "bounce-scale": "bounce-scale 0.6s ease-in-out infinite",
+        "crash-pulse": "crash-pulse 1s ease-out infinite",
       },
     },
   },
