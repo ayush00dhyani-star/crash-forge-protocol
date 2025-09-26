@@ -29,20 +29,29 @@ export const CrashChart = ({
 
   // Reset chart when new round starts
   useEffect(() => {
-    if (isActive && !isCrashed && chartData.length === 0) {
-      setStartTime(Date.now());
-      setChartData([{ time: 0, multiplier: 1.0 }]);
+    if (isActive && !isCrashed) {
+      if (chartData.length === 0) {
+        setStartTime(Date.now());
+        setChartData([{ time: 0, multiplier: 1.0 }]);
+      }
     }
-  }, [isActive, isCrashed, chartData.length]);
+  }, [isActive, isCrashed]);
 
   // Add data points during active round
   useEffect(() => {
-    if (isActive && !isCrashed) {
+    if (isActive && !isCrashed && startTime > 0) {
       const currentTime = Date.now() - startTime;
-      setChartData(prev => [
-        ...prev,
-        { time: currentTime, multiplier: currentMultiplier }
-      ].slice(-200)); // Keep last 200 points for performance
+      setChartData(prev => {
+        // Only add if multiplier actually changed
+        const lastPoint = prev[prev.length - 1];
+        if (!lastPoint || lastPoint.multiplier !== currentMultiplier) {
+          return [
+            ...prev,
+            { time: currentTime, multiplier: currentMultiplier }
+          ].slice(-300); // Keep more points for smoother animation
+        }
+        return prev;
+      });
     }
   }, [currentMultiplier, isActive, isCrashed, startTime]);
 

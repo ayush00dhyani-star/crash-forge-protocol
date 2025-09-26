@@ -152,12 +152,16 @@ export const useGameEngine = () => {
   useEffect(() => {
     if (isRoundActive && !isCrashed) {
       // Higher refresh rate for better animation
-      multiplierIntervalRef.current = setInterval(updateMultiplier, 16); // ~60fps
+      multiplierIntervalRef.current = setInterval(updateMultiplier, 50); // 20fps for smooth updates
       return () => {
         if (multiplierIntervalRef.current) {
           clearInterval(multiplierIntervalRef.current);
         }
       };
+    } else {
+      if (multiplierIntervalRef.current) {
+        clearInterval(multiplierIntervalRef.current);
+      }
     }
   }, [isRoundActive, isCrashed, updateMultiplier]);
 
@@ -182,6 +186,8 @@ export const useGameEngine = () => {
     // Calculate crash point for this round
     const newCrashPoint = calculateCrashPoint(roundId);
     crashPointRef.current = newCrashPoint;
+    
+    console.log(`🚀 Starting Round #${roundId} - Crash Point: ${newCrashPoint.toFixed(2)}x`);
     
     // Reset round state
     setIsRoundActive(true);
@@ -229,7 +235,9 @@ export const useGameEngine = () => {
   }, []);
 
   const handlePlaceBet = useCallback((amount: number) => {
-    if (!isRoundActive || currentBet || balance < amount) return false;
+    if (currentBet || balance < amount || amount <= 0) return false;
+    
+    console.log(`💰 Placing bet: ${amount} SOL | Round Active: ${isRoundActive}`);
     
     setCurrentBet(amount);
     setBalance(prev => prev - amount);
@@ -249,7 +257,7 @@ export const useGameEngine = () => {
     });
     
     return true;
-  }, [isRoundActive, currentBet, balance, addFeedEvent, toast]);
+  }, [currentBet, balance, addFeedEvent, toast]);
 
   const handleCashOut = useCallback(() => {
     if (!currentBet || !isRoundActive || isCrashed || cashOutRequested) return false;

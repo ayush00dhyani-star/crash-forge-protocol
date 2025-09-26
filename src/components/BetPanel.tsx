@@ -15,6 +15,7 @@ interface BetPanelProps {
   balance: number;
   autoCashOut: number | null;
   setAutoCashOut: (value: number | null) => void;
+  currentMultiplier?: number;
 }
 
 export const BetPanel = ({ 
@@ -26,7 +27,8 @@ export const BetPanel = ({
   canCashOut, 
   balance,
   autoCashOut,
-  setAutoCashOut
+  setAutoCashOut,
+  currentMultiplier = 1.0
 }: BetPanelProps) => {
   const [betAmount, setBetAmount] = useState("5.0");
   const [autoMode, setAutoMode] = useState(false);
@@ -39,13 +41,13 @@ export const BetPanel = ({
   }, [betAmount, balance]);
 
   const handlePlaceBet = useCallback(() => {
-    if (isValidBet() && !isRoundActive) {
+    if (isValidBet()) {
       const success = onPlaceBet(parseFloat(betAmount));
       if (success && autoMode && autoCashOut) {
         setAutoCashOut(autoCashOut);
       }
     }
-  }, [betAmount, isValidBet, isRoundActive, onPlaceBet, autoMode, autoCashOut, setAutoCashOut]);
+  }, [betAmount, isValidBet, onPlaceBet, autoMode, autoCashOut, setAutoCashOut]);
 
   const getPotentialWin = () => {
     const amount = parseFloat(betAmount) || 0;
@@ -191,12 +193,12 @@ export const BetPanel = ({
               variant="bet"
               size="xl"
               onClick={handlePlaceBet}
-              disabled={isRoundActive || !isValidBet()}
+              disabled={!isValidBet() || hasActiveBet}
               className="w-full text-lg font-black relative overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-neon-blue via-neon-purple to-neon-blue animate-pulse opacity-20"></div>
               <span className="relative z-10">
-                {isRoundActive ? "🚫 ROUND IN PROGRESS" : "🚀 SEND IT TO THE MOON!"}
+                {hasActiveBet ? "🎯 BET PLACED!" : "🚀 SEND IT TO THE MOON!"}
               </span>
             </Button>
 
@@ -243,7 +245,10 @@ export const BetPanel = ({
               <div className="text-center p-4 bg-black/30 rounded-lg border border-border">
                 <div className="text-sm text-muted-foreground">Current Value</div>
                 <div className="text-lg font-mono font-bold text-green-400">
-                  {(currentBet * 1.0).toFixed(4)} SOL
+                  {(currentBet * currentMultiplier).toFixed(4)} SOL
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  At {currentMultiplier.toFixed(2)}x multiplier
                 </div>
               </div>
             )}

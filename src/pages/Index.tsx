@@ -9,6 +9,8 @@ import { GameChat } from "@/components/GameChat";
 import { MatrixRain } from "@/components/MatrixRain";
 import { FloatingEmojis } from "@/components/FloatingEmojis";
 import { CrashChart } from "@/components/CrashChart";
+import { RoundTimer } from "@/components/RoundTimer";
+import { SoundEffects } from "@/components/SoundEffects";
 import { useGameEngine } from "@/hooks/useGameEngine";
 
 const Index = () => {
@@ -58,6 +60,14 @@ const Index = () => {
       <FloatingEmojis trigger={showLossEmojis} type="loss" />
       <FloatingEmojis trigger={showBetEmojis} type="bet" />
 
+      {/* Sound Effects */}
+      <SoundEffects
+        playBetSound={showBetEmojis}
+        playCashoutSound={showWinEmojis}
+        playCrashSound={showLossEmojis}
+        playTickSound={isRoundActive && currentMultiplier > 1.0}
+      />
+
       {/* Header */}
       <header className="border-b border-border bg-black/20 backdrop-blur-xl relative z-10">
         <div className="container mx-auto px-4 py-6">
@@ -87,12 +97,24 @@ const Index = () => {
 
       <main className="container mx-auto px-4 py-8 space-y-8">
         {/* Game Stats */}
-        <GameStats
-          totalPlayers={gameStats.totalPlayers}
-          totalBets={gameStats.totalBets}
-          roundId={roundId}
-          timeRemaining={timeRemaining}
-        />
+        <div className="grid md:grid-cols-4 gap-4">
+          <div className="md:col-span-3">
+            <GameStats
+              totalPlayers={gameStats.totalPlayers}
+              totalBets={gameStats.totalBets}
+              roundId={roundId}
+              timeRemaining={timeRemaining}
+            />
+          </div>
+          <div>
+            <RoundTimer
+              timeRemaining={timeRemaining}
+              isRoundActive={isRoundActive}
+              isCrashed={isCrashed}
+              roundId={roundId}
+            />
+          </div>
+        </div>
 
         {/* Main Game Area */}
         <div className="grid lg:grid-cols-3 gap-8">
@@ -124,6 +146,7 @@ const Index = () => {
               balance={balance}
               autoCashOut={autoCashOut}
               setAutoCashOut={setAutoCashOut}
+              currentMultiplier={currentMultiplier}
             />
 
             {/* Live Feed & Chat */}
