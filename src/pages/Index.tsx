@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,142 +8,45 @@ import { LiveFeed } from "@/components/LiveFeed";
 import { GameChat } from "@/components/GameChat";
 import { MatrixRain } from "@/components/MatrixRain";
 import { FloatingEmojis } from "@/components/FloatingEmojis";
-import { useToast } from "@/hooks/use-toast";
-
-interface FeedEvent {
-  id: string;
-  type: "bet" | "cashout" | "crash";
-  player: string;
-  amount: number;
-  multiplier?: number;
-  timestamp: number;
-}
+import { CrashChart } from "@/components/CrashChart";
+import { useGameEngine } from "@/hooks/useGameEngine";
 
 const Index = () => {
-  const { toast } = useToast();
-  const [currentMultiplier, setCurrentMultiplier] = useState(1.00);
-  const [isRoundActive, setIsRoundActive] = useState(false);
-  const [isCrashed, setIsCrashed] = useState(false);
-  const [roundId, setRoundId] = useState(1);
-  const [timeRemaining, setTimeRemaining] = useState(5);
-  const [currentBet, setCurrentBet] = useState<number | null>(null);
-  const [balance, setBalance] = useState(100.0); // Mock balance
-  const [feedEvents, setFeedEvents] = useState<FeedEvent[]>([]);
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
-  const [showWinEmojis, setShowWinEmojis] = useState(false);
-  const [showLossEmojis, setShowLossEmojis] = useState(false);
-  const [showBetEmojis, setShowBetEmojis] = useState(false);
-  
-  // Mock game stats
-  const [gameStats, setGameStats] = useState({
-    totalPlayers: 42,
-    totalBets: 156.7
-  });
-
-  // Simulate multiplier growth during active rounds
-  useEffect(() => {
-    if (isRoundActive && !isCrashed) {
-      const interval = setInterval(() => {
-        setCurrentMultiplier(prev => {
-          const newMultiplier = prev + 0.01;
-          // Random crash between 1.1x and 10x
-          const crashPoint = 1.1 + Math.random() * 8.9;
-          if (newMultiplier >= crashPoint) {
-            setIsCrashed(true);
-            setIsRoundActive(false);
-            addFeedEvent("crash", "system", 0, newMultiplier);
-            setShowLossEmojis(true);
-            setTimeout(() => setShowLossEmojis(false), 100);
-            toast({
-              title: "💥 REKT! Market Crashed! 💥",
-              description: `Get fucked at ${newMultiplier.toFixed(2)}x - should have cashed out!`,
-              variant: "destructive",
-            });
-            setTimeout(() => {
-              startNewRound();
-            }, 3000);
-          }
-          return newMultiplier;
-        });
-      }, 50);
-
-      return () => clearInterval(interval);
-    }
-  }, [isRoundActive, isCrashed, toast]);
-
-  // Countdown timer for next round
-  useEffect(() => {
-    if (!isRoundActive && !isCrashed) {
-      const interval = setInterval(() => {
-        setTimeRemaining(prev => {
-          if (prev <= 1) {
-            setIsRoundActive(true);
-            setCurrentMultiplier(1.00);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-
-      return () => clearInterval(interval);
-    }
-  }, [isRoundActive, isCrashed]);
-
-  const startNewRound = () => {
-    setIsCrashed(false);
-    setIsRoundActive(false);
-    setCurrentMultiplier(1.00);
-    setRoundId(prev => prev + 1);
-    setTimeRemaining(5);
-    setCurrentBet(null);
-  };
-
-  const addFeedEvent = (type: "bet" | "cashout" | "crash", player: string, amount: number, multiplier?: number) => {
-    const event: FeedEvent = {
-      id: Date.now().toString(),
-      type,
-      player,
-      amount,
-      multiplier,
-      timestamp: Date.now()
-    };
-    setFeedEvents(prev => [event, ...prev.slice(0, 19)]); // Keep last 20 events
-  };
-
-  const handlePlaceBet = (amount: number) => {
-    if (balance >= amount) {
-      setCurrentBet(amount);
-      setBalance(prev => prev - amount);
-      const mockPlayer = `${Math.random().toString(36).substr(2, 4)}...${Math.random().toString(36).substr(2, 4)}`;
-      addFeedEvent("bet", mockPlayer, amount);
-      setGameStats(prev => ({
-        ...prev,
-        totalBets: prev.totalBets + amount
-      }));
-      setShowBetEmojis(true);
-      setTimeout(() => setShowBetEmojis(false), 100);
-      toast({
-        title: "🎯 Bet Placed! Time to get REKT! 🎯",
-        description: `${amount.toFixed(2)} SOL sent to the void`,
-      });
-    }
-  };
-
-  const handleCashOut = () => {
-    if (currentBet && isRoundActive && !isCrashed) {
-      const payout = currentBet * currentMultiplier;
-      setBalance(prev => prev + payout);
-      const mockPlayer = `${Math.random().toString(36).substr(2, 4)}...${Math.random().toString(36).substr(2, 4)}`;
-      addFeedEvent("cashout", mockPlayer, currentBet, currentMultiplier);
-      setCurrentBet(null);
-      setShowWinEmojis(true);
-      setTimeout(() => setShowWinEmojis(false), 100);
-      toast({
-        title: "💰 BASED! Cashed Out Like a Chad! 💰",
-        description: `Won ${payout.toFixed(2)} SOL at ${currentMultiplier.toFixed(2)}x - not totally retarded!`,
-      });
-    }
-  };
+  const {
+    // Game state
+    currentMultiplier,
+    isRoundActive,
+    isCrashed,
+    roundId,
+    timeRemaining,
+    crashPoint,
+    
+    // Player state
+    currentBet,
+    balance,
+    isWalletConnected,
+    autoCashOut,
+    setAutoCashOut,
+    
+    // Game data
+    feedEvents,
+    roundHistory,
+    gameStats,
+    
+    // Effects
+    showWinEmojis,
+    showLossEmojis,
+    showBetEmojis,
+    
+    // Actions
+    handlePlaceBet,
+    handleCashOut,
+    toggleWallet,
+    
+    // Utils
+    canCashOut,
+    hasActiveBet
+  } = useGameEngine();
 
   return (
     <div className="min-h-screen bg-gradient-game relative overflow-hidden">
@@ -174,7 +76,7 @@ const Index = () => {
             <Button 
               variant="neon" 
               size="xl"
-              onClick={() => setIsWalletConnected(!isWalletConnected)}
+              onClick={toggleWallet}
               className="font-black"
             >
               {isWalletConnected ? "🟢 WALLET CONNECTED" : "🔌 CONNECT WALLET"}
@@ -194,8 +96,15 @@ const Index = () => {
 
         {/* Main Game Area */}
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Multiplier Display */}
-          <div className="lg:col-span-2">
+          {/* Chart and Multiplier Display */}
+          <div className="lg:col-span-2 space-y-6">
+            <CrashChart
+              currentMultiplier={currentMultiplier}
+              isActive={isRoundActive}
+              isCrashed={isCrashed}
+              crashPoint={crashPoint}
+            />
+            
             <MultiplierDisplay
               currentMultiplier={currentMultiplier}
               isActive={isRoundActive}
@@ -210,9 +119,11 @@ const Index = () => {
               onPlaceBet={handlePlaceBet}
               onCashOut={handleCashOut}
               currentBet={currentBet}
-              hasActiveBet={!!currentBet}
-              canCashOut={isRoundActive && !isCrashed && !!currentBet}
+              hasActiveBet={hasActiveBet}
+              canCashOut={canCashOut}
               balance={balance}
+              autoCashOut={autoCashOut}
+              setAutoCashOut={setAutoCashOut}
             />
 
             {/* Live Feed & Chat */}
@@ -240,7 +151,24 @@ const Index = () => {
           <Card className="p-6 bg-gradient-to-br from-red-950/30 to-red-900/20 backdrop-blur-sm border-neon-red/30 retro-crt">
             <h3 className="text-lg font-black mb-4 text-center text-neon-red">💀 RECENT CASUALTIES</h3>
             <div className="space-y-2">
-              {[
+              {roundHistory.slice(0, 5).map((result, index) => {
+                const mockRekt = Math.floor(Math.random() * 100) + 10;
+                return (
+                  <div key={result.id} className="flex justify-between items-center p-2 bg-black/30 rounded">
+                    <span className="text-xs text-red-300">Round #{result.id}</span>
+                    <div className="text-right">
+                      <Badge 
+                        variant="outline" 
+                        className={`${result.crash > 2 ? 'text-green-400 border-green-400/30' : 'text-red-400 border-red-400/30'} text-xs`}
+                      >
+                        💥 {result.crash.toFixed(2)}x
+                      </Badge>
+                      <div className="text-xs text-red-200 mt-1">{mockRekt} degens REKT</div>
+                    </div>
+                  </div>
+                );
+              })}
+              {roundHistory.length === 0 && [
                 { round: roundId - 1, crash: 3.47, rekt: "47 degens" },
                 { round: roundId - 2, crash: 1.23, rekt: "123 paper hands" },
                 { round: roundId - 3, crash: 8.91, rekt: "12 diamond hands" },
@@ -256,7 +184,7 @@ const Index = () => {
                     >
                       💥 {result.crash.toFixed(2)}x
                     </Badge>
-                    <div className="text-xs text-red-200 mt-1">{result.rekt} REKT</div>
+                    <div className="text-xs text-red-200 mt-1">{result.rekt}</div>
                   </div>
                 </div>
               ))}
