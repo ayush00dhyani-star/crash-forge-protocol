@@ -83,21 +83,20 @@ export const useGameEngine = () => {
     return Math.max(1.01, Math.min(1000, Math.floor(crashMultiplier * 100) / 100));
   }, []);
 
-  // Enhanced multiplier growth with acceleration
+  // Enhanced multiplier growth with smooth deterministic curve
   const updateMultiplier = useCallback(() => {
     if (!isRoundActive || isCrashed) return;
-    
+
     const elapsed = Date.now() - roundStartTimeRef.current;
     const elapsedSeconds = elapsed / 1000;
-    
-    // Accelerating curve: starts slow, gets faster
-    const baseGrowth = 0.02; // 2% per tick base
-    const acceleration = 1 + (elapsedSeconds * 0.1); // 10% acceleration per second
-    const growth = baseGrowth * acceleration;
-    
+
     setCurrentMultiplier(prev => {
-      const newMultiplier = prev + growth;
-      
+      // Smooth, accelerating curve based on time (monotonic)
+      const t = Math.max(0, elapsedSeconds);
+      const curve = 1 + Math.pow(t * 0.95, 1.35) + (t * 0.12);
+
+      const newMultiplier = curve;
+
       // Check if we've hit the crash point
       if (newMultiplier >= crashPointRef.current) {
         setIsCrashed(true);
@@ -106,7 +105,6 @@ export const useGameEngine = () => {
         
         // Handle player bet
         if (currentBet && !cashOutRequested) {
-          // Player lost
           addFeedEvent("crash", "You", currentBet, crashPointRef.current);
           setShowLossEmojis(true);
           setTimeout(() => setShowLossEmojis(false), 2000);
@@ -131,10 +129,10 @@ export const useGameEngine = () => {
           biggestMultiplier: Math.max(prev.biggestMultiplier, crashPointRef.current)
         }));
         
-        // Auto-start next round
+        // Auto-start next round faster
         setTimeout(() => {
           startNewRound();
-        }, 3000);
+        }, 1500);
         
         return crashPointRef.current;
       }
@@ -146,13 +144,13 @@ export const useGameEngine = () => {
       
       return newMultiplier;
     });
-  }, [isRoundActive, isCrashed, currentBet, cashOutRequested, autoCashOut, roundId, toast]);
+  }, [isRoundActive, isCrashed, currentBet, cashOutRequested, autoCashOut, roundId, toast])
 
   // Multiplier update loop with dynamic timing
   useEffect(() => {
     if (isRoundActive && !isCrashed) {
       // Higher refresh rate for better animation
-      multiplierIntervalRef.current = setInterval(updateMultiplier, 50); // 20fps for smooth updates
+      multiplierIntervalRef.current = setInterval(updateMultiplier, 16); // ~60fps for ultra-smooth updates
       return () => {
         if (multiplierIntervalRef.current) {
           clearInterval(multiplierIntervalRef.current);
@@ -216,7 +214,9 @@ export const useGameEngine = () => {
 
   const startNewRound = useCallback(() => {
     setRoundId(prev => prev + 1);
-    setTimeRemaining(5);
+    // Randomize short prep time between 1-2 seconds
+    const prep = 1 + Math.floor(Math.random() * 2);
+    setTimeRemaining(prep);
     setCurrentBet(null);
     setCashOutRequested(false);
     setCrashPoint(0);

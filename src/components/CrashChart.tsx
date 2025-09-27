@@ -83,9 +83,14 @@ export const CrashChart = ({
     canvas.height = rect.height * dpr;
     ctx.scale(dpr, dpr);
 
+    // Theme colors from CSS variables
+    const rootStyles = getComputedStyle(document.documentElement);
+    const primaryVar = rootStyles.getPropertyValue('--primary').trim() || '142 71% 45%';
+    const destructiveVar = rootStyles.getPropertyValue('--destructive').trim() || '0 84% 60%';
+    const mutedVar = rootStyles.getPropertyValue('--muted-foreground').trim() || '215 20% 65%';
+
     // Clear canvas
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-    ctx.fillRect(0, 0, rect.width, rect.height);
+    ctx.clearRect(0, 0, rect.width, rect.height);
 
     if (chartData.length === 0) return;
 
@@ -100,27 +105,28 @@ export const CrashChart = ({
     const chartHeight = rect.height - (padding * 2);
 
     // Draw grid
-    ctx.strokeStyle = 'rgba(34, 197, 94, 0.1)';
+    ctx.strokeStyle = `hsl(${primaryVar} / 0.12)`;
     ctx.lineWidth = 1;
     
     // Horizontal lines (multiplier)
+    const safeDen = Math.max(0.0001, (maxMultiplier - minMultiplier));
     for (let i = 1; i <= Math.ceil(maxMultiplier); i++) {
-      const y = padding + chartHeight - ((i - minMultiplier) / (maxMultiplier - minMultiplier)) * chartHeight;
+      const y = padding + chartHeight - ((i - minMultiplier) / safeDen) * chartHeight;
       ctx.beginPath();
       ctx.moveTo(padding, y);
       ctx.lineTo(padding + chartWidth, y);
       ctx.stroke();
       
       // Labels
-      ctx.fillStyle = 'rgba(34, 197, 94, 0.6)';
+      ctx.fillStyle = `hsl(${mutedVar})`;
       ctx.font = '12px monospace';
       ctx.fillText(`${i.toFixed(1)}x`, 5, y + 4);
     }
 
     // Vertical lines (time)
-    const timeInterval = Math.max(1000, maxTime / 10);
+    const timeInterval = Math.max(500, maxTime / 8);
     for (let t = 0; t <= maxTime; t += timeInterval) {
-      const x = padding + (t / maxTime) * chartWidth;
+      const x = padding + (t / Math.max(1, maxTime)) * chartWidth;
       ctx.beginPath();
       ctx.moveTo(x, padding);
       ctx.lineTo(x, padding + chartHeight);
@@ -129,16 +135,12 @@ export const CrashChart = ({
 
     // Draw the main line with enhanced animation
     if (chartData.length > 1) {
-      // Create gradient line
-      const gradient = ctx.createLinearGradient(0, 0, chartWidth, 0);
-      if (isCrashed) {
-        gradient.addColorStop(0, '#ef4444');
-        gradient.addColorStop(1, '#dc2626');
-      } else {
-        gradient.addColorStop(0, '#22c55e');
-        gradient.addColorStop(0.5, '#16a34a');
-        gradient.addColorStop(1, '#15803d');
-      }
+      // Create gradient line using theme
+      const gradient = ctx.createLinearGradient(padding, 0, padding + chartWidth, 0);
+      const mainColor = isCrashed ? `hsl(${destructiveVar})` : `hsl(${primaryVar})`;
+      gradient.addColorStop(0, mainColor);
+      gradient.addColorStop(0.7, mainColor);
+      gradient.addColorStop(1, mainColor);
       
       ctx.strokeStyle = gradient;
       ctx.lineWidth = 4;
@@ -146,16 +148,19 @@ export const CrashChart = ({
       ctx.lineJoin = 'round';
       
       // Enhanced glow effect
-      ctx.shadowColor = isCrashed ? '#ef4444' : '#22c55e';
+      ctx.shadowColor = mainColor;
       ctx.shadowBlur = 15;
       ctx.shadowOffsetX = 0;
       ctx.shadowOffsetY = 0;
       
-      // Draw smooth bezier curve
+      const wiggleAmp = Math.min(10, chartHeight * 0.03);
+      // Draw smooth bezier curve with subtle wiggle
       ctx.beginPath();
       chartData.forEach((point, index) => {
-        const x = padding + (point.time / maxTime) * chartWidth;
-        const y = padding + chartHeight - ((point.multiplier - minMultiplier) / (maxMultiplier - minMultiplier)) * chartHeight;
+        const x = padding + (point.time / Math.max(1, maxTime)) * chartWidth;
+        const baseY = padding + chartHeight - ((point.multiplier - minMultiplier) / Math.max(0.0001, (maxMultiplier - minMultiplier))) * chartHeight;
+        const wiggle = isCrashed ? 0 : Math.sin((point.time / 120) + index * 0.35) * wiggleAmp;
+        const y = baseY - wiggle;
         
         if (index === 0) {
           ctx.moveTo(x, y);
@@ -164,8 +169,10 @@ export const CrashChart = ({
         } else {
           // Smooth curve using quadratic bezier
           const prevPoint = chartData[index - 1];
-          const prevX = padding + (prevPoint.time / maxTime) * chartWidth;
-          const prevY = padding + chartHeight - ((prevPoint.multiplier - minMultiplier) / (maxMultiplier - minMultiplier)) * chartHeight;
+          const prevX = padding + (prevPoint.time / Math.max(1, maxTime)) * chartWidth;
+          const prevBaseY = padding + chartHeight - ((prevPoint.multiplier - minMultiplier) / Math.max(0.0001, (maxMultiplier - minMultiplier))) * chartHeight;
+          const prevWiggle = isCrashed ? 0 : Math.sin((prevPoint.time / 120) + (index - 1) * 0.35) * wiggleAmp;
+          const prevY = prevBaseY - prevWiggle;
           
           const controlX = (prevX + x) / 2;
           const controlY = (prevY + y) / 2;
@@ -180,13 +187,16 @@ export const CrashChart = ({
 
       // Draw area under curve
       ctx.fillStyle = isCrashed 
-        ? 'rgba(239, 68, 68, 0.1)' 
-        : 'rgba(34, 197, 94, 0.1)';
+        ? `hsl(${destructiveVar} / 0.08)` 
+        : `hsl(${primaryVar} / 0.08)`;
       
       ctx.beginPath();
+      const wiggleAmpArea = Math.min(10, chartHeight * 0.03);
       chartData.forEach((point, index) => {
-        const x = padding + (point.time / maxTime) * chartWidth;
-        const y = padding + chartHeight - ((point.multiplier - minMultiplier) / (maxMultiplier - minMultiplier)) * chartHeight;
+        const x = padding + (point.time / Math.max(1, maxTime)) * chartWidth;
+        const baseY = padding + chartHeight - ((point.multiplier - minMultiplier) / Math.max(0.0001, (maxMultiplier - minMultiplier))) * chartHeight;
+        const wiggle = isCrashed ? 0 : Math.sin((point.time / 120) + index * 0.35) * wiggleAmpArea;
+        const y = baseY - wiggle;
         
         if (index === 0) {
           ctx.moveTo(x, y);
@@ -197,7 +207,7 @@ export const CrashChart = ({
       
       // Complete the area
       const lastPoint = chartData[chartData.length - 1];
-      const lastX = padding + (lastPoint.time / maxTime) * chartWidth;
+      const lastX = padding + (lastPoint.time / Math.max(1, maxTime)) * chartWidth;
       const bottomY = padding + chartHeight;
       
       ctx.lineTo(lastX, bottomY);
@@ -208,17 +218,20 @@ export const CrashChart = ({
       // Draw current point
       if (isActive || isCrashed) {
         const currentPoint = chartData[chartData.length - 1];
-        const currentX = padding + (currentPoint.time / maxTime) * chartWidth;
-        const currentY = padding + chartHeight - ((currentPoint.multiplier - minMultiplier) / (maxMultiplier - minMultiplier)) * chartHeight;
+        const currentX = padding + (currentPoint.time / Math.max(1, maxTime)) * chartWidth;
+        const baseY = padding + chartHeight - ((currentPoint.multiplier - minMultiplier) / Math.max(0.0001, (maxMultiplier - minMultiplier))) * chartHeight;
+        const wiggle = isCrashed ? 0 : Math.sin((currentPoint.time / 120) + chartData.length * 0.35) * Math.min(10, chartHeight * 0.03);
+        const currentY = baseY - wiggle;
         
         // Pulsing circle
-        ctx.fillStyle = isCrashed ? '#ef4444' : '#22c55e';
+        const mainColor = isCrashed ? `hsl(${destructiveVar})` : `hsl(${primaryVar})`;
+        ctx.fillStyle = mainColor;
         ctx.beginPath();
         ctx.arc(currentX, currentY, 6, 0, Math.PI * 2);
         ctx.fill();
         
         // Outer ring
-        ctx.strokeStyle = isCrashed ? '#ef4444' : '#22c55e';
+        ctx.strokeStyle = mainColor;
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.arc(currentX, currentY, 12, 0, Math.PI * 2);
@@ -228,7 +241,7 @@ export const CrashChart = ({
 
     // Draw crash point if crashed
     if (isCrashed && crashPoint) {
-      ctx.fillStyle = '#ef4444';
+      ctx.fillStyle = `hsl(${destructiveVar})`;
       ctx.font = 'bold 16px monospace';
       ctx.textAlign = 'center';
       ctx.fillText('💥 CRASHED!', rect.width / 2, 30);
@@ -290,7 +303,7 @@ export const CrashChart = ({
         ref={canvasRef}
         className="absolute inset-6 w-[calc(100%-3rem)] h-[calc(100%-3rem)]"
         style={{ 
-          background: 'radial-gradient(circle at 30% 70%, rgba(34, 197, 94, 0.05) 0%, transparent 50%)'
+          background: 'radial-gradient(circle at 30% 70%, hsl(var(--primary) / 0.06) 0%, transparent 50%)'
         }}
       />
 
