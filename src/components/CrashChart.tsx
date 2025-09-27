@@ -30,25 +30,30 @@ export const CrashChart = ({
   // Reset chart when new round starts
   useEffect(() => {
     if (isActive && !isCrashed) {
-      if (chartData.length === 0) {
-        setStartTime(Date.now());
-        setChartData([{ time: 0, multiplier: 1.0 }]);
-      }
+      setStartTime(Date.now());
+      setChartData([{ time: 0, multiplier: 1.0 }]);
+    } else if (!isActive && !isCrashed) {
+      // Clear chart for next round
+      setChartData([]);
+      setStartTime(0);
     }
   }, [isActive, isCrashed]);
 
-  // Add data points during active round
+  // Add data points during active round with smooth interpolation
   useEffect(() => {
     if (isActive && !isCrashed && startTime > 0) {
       const currentTime = Date.now() - startTime;
+      
       setChartData(prev => {
-        // Only add if multiplier actually changed
         const lastPoint = prev[prev.length - 1];
-        if (!lastPoint || lastPoint.multiplier !== currentMultiplier) {
-          return [
-            ...prev,
-            { time: currentTime, multiplier: currentMultiplier }
-          ].slice(-300); // Keep more points for smoother animation
+        
+        // Always add new points for smooth animation
+        if (!lastPoint || Math.abs(lastPoint.multiplier - currentMultiplier) > 0.001) {
+          const newPoint = { time: currentTime, multiplier: currentMultiplier };
+          const newData = [...prev, newPoint];
+          
+          // Keep last 500 points for ultra-smooth animation
+          return newData.slice(-500);
         }
         return prev;
       });
@@ -122,17 +127,31 @@ export const CrashChart = ({
       ctx.stroke();
     }
 
-    // Draw the main line
+    // Draw the main line with enhanced animation
     if (chartData.length > 1) {
-      ctx.strokeStyle = isCrashed ? '#ef4444' : '#22c55e';
-      ctx.lineWidth = 3;
+      // Create gradient line
+      const gradient = ctx.createLinearGradient(0, 0, chartWidth, 0);
+      if (isCrashed) {
+        gradient.addColorStop(0, '#ef4444');
+        gradient.addColorStop(1, '#dc2626');
+      } else {
+        gradient.addColorStop(0, '#22c55e');
+        gradient.addColorStop(0.5, '#16a34a');
+        gradient.addColorStop(1, '#15803d');
+      }
+      
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = 4;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
       
-      // Add glow effect
+      // Enhanced glow effect
       ctx.shadowColor = isCrashed ? '#ef4444' : '#22c55e';
-      ctx.shadowBlur = 10;
+      ctx.shadowBlur = 15;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
       
+      // Draw smooth bezier curve
       ctx.beginPath();
       chartData.forEach((point, index) => {
         const x = padding + (point.time / maxTime) * chartWidth;
@@ -140,8 +159,18 @@ export const CrashChart = ({
         
         if (index === 0) {
           ctx.moveTo(x, y);
-        } else {
+        } else if (index === 1) {
           ctx.lineTo(x, y);
+        } else {
+          // Smooth curve using quadratic bezier
+          const prevPoint = chartData[index - 1];
+          const prevX = padding + (prevPoint.time / maxTime) * chartWidth;
+          const prevY = padding + chartHeight - ((prevPoint.multiplier - minMultiplier) / (maxMultiplier - minMultiplier)) * chartHeight;
+          
+          const controlX = (prevX + x) / 2;
+          const controlY = (prevY + y) / 2;
+          
+          ctx.quadraticCurveTo(controlX, controlY, x, y);
         }
       });
       ctx.stroke();

@@ -99,12 +99,7 @@ const Index = () => {
         {/* Game Stats */}
         <div className="grid md:grid-cols-4 gap-4">
           <div className="md:col-span-3">
-            <GameStats
-              totalPlayers={gameStats.totalPlayers}
-              totalBets={gameStats.totalBets}
-              roundId={roundId}
-              timeRemaining={timeRemaining}
-            />
+            <GameStats gameStats={gameStats} roundHistory={roundHistory} />
           </div>
           <div>
             <RoundTimer

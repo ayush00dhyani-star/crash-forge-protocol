@@ -237,7 +237,10 @@ export const useGameEngine = () => {
   const handlePlaceBet = useCallback((amount: number) => {
     if (currentBet || balance < amount || amount <= 0) return false;
     
-    console.log(`💰 Placing bet: ${amount} SOL | Round Active: ${isRoundActive}`);
+    // Only allow bets during countdown or active round
+    if (isCrashed) return false;
+    
+    console.log(`💰 Placing bet: ${amount} SOL | Round Active: ${isRoundActive} | Time: ${timeRemaining}`);
     
     setCurrentBet(amount);
     setBalance(prev => prev - amount);
@@ -257,7 +260,7 @@ export const useGameEngine = () => {
     });
     
     return true;
-  }, [currentBet, balance, addFeedEvent, toast]);
+  }, [currentBet, balance, isRoundActive, isCrashed, timeRemaining, addFeedEvent, toast]);
 
   const handleCashOut = useCallback(() => {
     if (!currentBet || !isRoundActive || isCrashed || cashOutRequested) return false;
