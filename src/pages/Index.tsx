@@ -11,6 +11,7 @@ import { FloatingEmojis } from "@/components/FloatingEmojis";
 import { CrashChart } from "@/components/CrashChart";
 import { RoundTimer } from "@/components/RoundTimer";
 import { SoundEffects } from "@/components/SoundEffects";
+import { AdvancedStats } from "@/components/AdvancedStats";
 import { useGameEngine } from "@/hooks/useGameEngine";
 
 const Index = () => {
@@ -96,10 +97,15 @@ const Index = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8 space-y-8">
-        {/* Game Stats */}
-        <div className="grid md:grid-cols-4 gap-4">
-          <div className="md:col-span-3">
-            <GameStats gameStats={gameStats} roundHistory={roundHistory} />
+        {/* Advanced Stats & Timer */}
+        <div className="grid lg:grid-cols-4 gap-6">
+          <div className="lg:col-span-3">
+            <AdvancedStats 
+              gameStats={gameStats} 
+              roundHistory={roundHistory}
+              currentMultiplier={currentMultiplier}
+              isActive={isRoundActive}
+            />
           </div>
           <div>
             <RoundTimer

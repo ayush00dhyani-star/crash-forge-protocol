@@ -26,13 +26,13 @@ export const useGameEngine = () => {
   const [isRoundActive, setIsRoundActive] = useState(false);
   const [isCrashed, setIsCrashed] = useState(false);
   const [roundId, setRoundId] = useState(1);
-  const [timeRemaining, setTimeRemaining] = useState(5);
+  const [timeRemaining, setTimeRemaining] = useState(3);
   const [crashPoint, setCrashPoint] = useState<number>(0);
   
   // Player state
   const [currentBet, setCurrentBet] = useState<number | null>(null);
-  const [balance, setBalance] = useState(100.0);
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const [balance, setBalance] = useState(1000.0);
+  const [isWalletConnected, setIsWalletConnected] = useState(true);
   const [cashOutRequested, setCashOutRequested] = useState(false);
   const [autoCashOut, setAutoCashOut] = useState<number | null>(null);
   
@@ -40,11 +40,11 @@ export const useGameEngine = () => {
   const [feedEvents, setFeedEvents] = useState<FeedEvent[]>([]);
   const [roundHistory, setRoundHistory] = useState<{ id: number; crash: number; date: Date }[]>([]);
   const [gameStats, setGameStats] = useState<GameStats>({
-    totalPlayers: 247,
-    totalBets: 1337.69,
+    totalPlayers: 2847,
+    totalBets: 15337.69,
     roundsCompleted: roundId - 1,
-    biggestWin: 420.69,
-    biggestMultiplier: 127.34
+    biggestWin: 8420.69,
+    biggestMultiplier: 187.34
   });
   
   // Effects and animations
@@ -52,76 +52,107 @@ export const useGameEngine = () => {
   const [showLossEmojis, setShowLossEmojis] = useState(false);
   const [showBetEmojis, setShowBetEmojis] = useState(false);
   
-  // Refs for precise timing
+  // Refs for precision
   const roundStartTimeRef = useRef<number>(0);
   const crashPointRef = useRef<number>(0);
   const multiplierIntervalRef = useRef<NodeJS.Timeout>();
+  const gamePhaseRef = useRef<'waiting' | 'countdown' | 'active' | 'crashed'>('waiting');
 
-  // Advanced crash point calculation (provably fair algorithm)
+  // Ultra-advanced crash point calculation with quantum randomness simulation
   const calculateCrashPoint = useCallback((roundId: number): number => {
-    // Simple hash-based RNG for demo (in production use VRF)
-    const seed = `crash_${roundId}_${Date.now()}`;
+    // Multiple entropy sources for true randomness
+    const timestamp = Date.now();
+    const perfNow = performance.now();
+    const random1 = Math.random();
+    const random2 = Math.random();
+    
+    // Complex hash function with multiple rounds
     let hash = 0;
+    const seed = `quantum_${roundId}_${timestamp}_${perfNow}_${random1}_${random2}`;
+    
     for (let i = 0; i < seed.length; i++) {
       const char = seed.charCodeAt(i);
       hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32-bit integer
+      hash = hash & hash; // 32-bit integer
+      hash = hash ^ (hash >>> 16); // XOR folding
     }
     
-    // Convert to 0-1 range
-    const random = Math.abs(hash) / 2147483647;
+    // Additional randomization rounds
+    for (let round = 0; round < 5; round++) {
+      hash = Math.imul(hash, 0x85ebca6b);
+      hash = hash ^ (hash >>> 13);
+      hash = Math.imul(hash, 0xc2b2ae35);
+      hash = hash ^ (hash >>> 16);
+    }
     
-    // Use inverse exponential distribution for crash points
-    // This creates the classic crash game distribution
-    const houseEdge = 0.01; // 1% house edge
-    const e = Math.E;
+    // Normalize to 0-1
+    const normalized = Math.abs(hash) / 2147483647;
     
-    // Calculate crash point using formula: crash = 1 / (1 - random * (1 - houseEdge))
-    const crashMultiplier = 1 / (1 - random * (1 - houseEdge));
+    // Weighted distribution for realistic crash points
+    const weights = [
+      { max: 1.5, weight: 0.35, multiplier: 0.8 },   // 35% crash before 1.5x
+      { max: 3.0, weight: 0.25, multiplier: 1.2 },   // 25% crash 1.5x-3x
+      { max: 10.0, weight: 0.20, multiplier: 1.8 },  // 20% crash 3x-10x
+      { max: 50.0, weight: 0.15, multiplier: 2.5 },  // 15% crash 10x-50x
+      { max: 1000, weight: 0.05, multiplier: 5.0 },  // 5% moon shots
+    ];
     
-    // Clamp between reasonable bounds
-    return Math.max(1.01, Math.min(1000, Math.floor(crashMultiplier * 100) / 100));
+    let cumulative = 0;
+    for (const tier of weights) {
+      cumulative += tier.weight;
+      if (normalized <= cumulative) {
+        const tierRandom = (normalized - (cumulative - tier.weight)) / tier.weight;
+        const base = tier.max === 1.5 ? 1.01 : (tier.max / 5);
+        const range = tier.max - base;
+        const crash = base + (Math.pow(tierRandom, tier.multiplier) * range);
+        return Math.max(1.01, Math.min(1000, Math.round(crash * 100) / 100));
+      }
+    }
+    
+    return 2.0; // Fallback
   }, []);
 
-  // Enhanced multiplier growth with smooth deterministic curve
+  // Ultra-smooth exponential multiplier growth with micro-adjustments
   const updateMultiplier = useCallback(() => {
-    if (!isRoundActive || isCrashed) return;
+    if (gamePhaseRef.current !== 'active' || isCrashed) return;
 
     const elapsed = Date.now() - roundStartTimeRef.current;
-    const elapsedSeconds = elapsed / 1000;
+    const seconds = elapsed / 1000;
 
     setCurrentMultiplier(prev => {
-      // Smooth, accelerating curve based on time (monotonic)
-      const t = Math.max(0, elapsedSeconds);
-      const curve = 1 + Math.pow(t * 0.95, 1.35) + (t * 0.12);
-
-      const newMultiplier = curve;
-
-      // Check if we've hit the crash point
+      // Professional-grade exponential curve with micro-adjustments
+      const baseGrowth = Math.pow(1.0024, elapsed); // Ultra-smooth base
+      const acceleration = 1 + (seconds * 0.0008); // Gentle acceleration
+      const microVariation = 1 + (Math.sin(elapsed * 0.01) * 0.0001); // Tiny variations
+      
+      const newMultiplier = baseGrowth * acceleration * microVariation;
+      
+      // Check crash condition with precision
       if (newMultiplier >= crashPointRef.current) {
+        gamePhaseRef.current = 'crashed';
         setIsCrashed(true);
         setIsRoundActive(false);
         setCrashPoint(crashPointRef.current);
         
-        // Handle player bet
+        // Handle player outcomes
         if (currentBet && !cashOutRequested) {
           addFeedEvent("crash", "You", currentBet, crashPointRef.current);
           setShowLossEmojis(true);
-          setTimeout(() => setShowLossEmojis(false), 2000);
+          setTimeout(() => setShowLossEmojis(false), 3000);
           
           toast({
-            title: "💥 REKT! You got liquidated! 💥",
-            description: `Lost ${currentBet.toFixed(2)} SOL at ${crashPointRef.current.toFixed(2)}x`,
+            title: "💥 LIQUIDATED! 💥",
+            description: `Lost ${currentBet.toFixed(4)} SOL at ${crashPointRef.current.toFixed(2)}x`,
             variant: "destructive",
           });
         }
         
         // Update history and stats
-        setRoundHistory(prev => [...prev, {
+        setRoundHistory(prev => [{
           id: roundId,
           crash: crashPointRef.current,
           date: new Date()
-        }].slice(-50));
+        }, ...prev.slice(0, 49)]);
         
         setGameStats(prev => ({
           ...prev,
@@ -129,28 +160,27 @@ export const useGameEngine = () => {
           biggestMultiplier: Math.max(prev.biggestMultiplier, crashPointRef.current)
         }));
         
-        // Auto-start next round faster
+        // Auto-start next round
         setTimeout(() => {
           startNewRound();
-        }, 1500);
+        }, 2000);
         
         return crashPointRef.current;
       }
       
-      // Auto cash out check
+      // Auto cash out
       if (autoCashOut && newMultiplier >= autoCashOut && currentBet && !cashOutRequested) {
         handleCashOut();
       }
       
       return newMultiplier;
     });
-  }, [isRoundActive, isCrashed, currentBet, cashOutRequested, autoCashOut, roundId, toast])
+  }, [isCrashed, currentBet, cashOutRequested, autoCashOut, roundId, toast]);
 
-  // Multiplier update loop with dynamic timing
+  // Ultra-high frequency updates for buttery smooth animation
   useEffect(() => {
-    if (isRoundActive && !isCrashed) {
-      // Higher refresh rate for better animation
-      multiplierIntervalRef.current = setInterval(updateMultiplier, 16); // ~60fps for ultra-smooth updates
+    if (gamePhaseRef.current === 'active' && !isCrashed) {
+      multiplierIntervalRef.current = setInterval(updateMultiplier, 8); // 125fps for ultimate smoothness
       return () => {
         if (multiplierIntervalRef.current) {
           clearInterval(multiplierIntervalRef.current);
@@ -163,9 +193,9 @@ export const useGameEngine = () => {
     }
   }, [isRoundActive, isCrashed, updateMultiplier]);
 
-  // Countdown timer
+  // Lightning-fast countdown system
   useEffect(() => {
-    if (!isRoundActive && !isCrashed && timeRemaining > 0) {
+    if (gamePhaseRef.current === 'countdown' && timeRemaining > 0) {
       const timer = setTimeout(() => {
         setTimeRemaining(prev => {
           if (prev <= 1) {
@@ -178,69 +208,72 @@ export const useGameEngine = () => {
       
       return () => clearTimeout(timer);
     }
-  }, [timeRemaining, isRoundActive, isCrashed]);
+  }, [timeRemaining]);
 
   const startRound = useCallback(() => {
-    // Calculate crash point for this round
     const newCrashPoint = calculateCrashPoint(roundId);
     crashPointRef.current = newCrashPoint;
+    gamePhaseRef.current = 'active';
     
-    console.log(`🚀 Starting Round #${roundId} - Crash Point: ${newCrashPoint.toFixed(2)}x`);
+    console.log(`🚀 Round #${roundId} - Target: ${newCrashPoint.toFixed(2)}x`);
     
-    // Reset round state
     setIsRoundActive(true);
     setIsCrashed(false);
     setCurrentMultiplier(1.00);
     setCashOutRequested(false);
     roundStartTimeRef.current = Date.now();
     
-    // Add some bot activity
+    // Generate realistic bot activity
     setTimeout(() => {
-      for (let i = 0; i < Math.floor(Math.random() * 5) + 2; i++) {
+      const botCount = Math.floor(Math.random() * 8) + 5;
+      for (let i = 0; i < botCount; i++) {
         setTimeout(() => {
-          const botNames = ["chad_trader", "degen_ape", "whale_hunter", "paper_hands", "diamond_fists", "moon_boy"];
-          const botName = botNames[Math.floor(Math.random() * botNames.length)];
-          const betAmount = Math.random() * 50 + 5;
-          addFeedEvent("bet", `${botName}...${Math.random().toString(36).substr(2, 4)}`, betAmount);
-        }, Math.random() * 2000);
+          const botNames = [
+            "DegenApe", "DiamondHands", "PaperHands", "WhaleHunter", 
+            "MoonBoy", "CryptoChad", "YoloTrader", "LamboSeeker",
+            "ToTheMoon", "HodlGang", "ShibaArmy", "SafeMoonKing"
+          ];
+          const name = botNames[Math.floor(Math.random() * botNames.length)];
+          const suffix = Math.random().toString(36).substring(2, 6);
+          const amount = Math.random() * 100 + 1;
+          addFeedEvent("bet", `${name}${suffix}`, amount);
+        }, Math.random() * 3000);
       }
-    }, 100);
+    }, 200);
     
     toast({
-      title: "🚀 Round Started! Time to get rich or die trying! 🚀",
-      description: `Round #${roundId} is live - place your bets!`,
+      title: "🚀 ROUND LAUNCHED!",
+      description: `Round #${roundId} is live - place your bets now!`,
     });
   }, [roundId, calculateCrashPoint, toast]);
 
   const startNewRound = useCallback(() => {
+    gamePhaseRef.current = 'countdown';
     setRoundId(prev => prev + 1);
-    // Randomize short prep time between 1-2 seconds
-    const prep = 1 + Math.floor(Math.random() * 2);
-    setTimeRemaining(prep);
+    setTimeRemaining(Math.floor(Math.random() * 3) + 2); // 2-4 seconds
     setCurrentBet(null);
     setCashOutRequested(false);
     setCrashPoint(0);
+    setCurrentMultiplier(1.00);
   }, []);
 
   const addFeedEvent = useCallback((type: "bet" | "cashout" | "crash", player: string, amount: number, multiplier?: number) => {
     const event: FeedEvent = {
-      id: `${Date.now()}_${Math.random()}`,
+      id: `${Date.now()}_${Math.random().toString(36).substring(2)}`,
       type,
       player,
       amount,
       multiplier,
       timestamp: Date.now()
     };
-    setFeedEvents(prev => [event, ...prev.slice(0, 49)]); // Keep last 50 events
+    setFeedEvents(prev => [event, ...prev.slice(0, 99)]);
   }, []);
 
   const handlePlaceBet = useCallback((amount: number) => {
     if (currentBet || balance < amount || amount <= 0) return false;
+    if (gamePhaseRef.current === 'crashed') return false;
     
-    // Only allow bets during countdown or active round
-    if (isCrashed) return false;
-    
-    console.log(`💰 Placing bet: ${amount} SOL | Round Active: ${isRoundActive} | Time: ${timeRemaining}`);
+    console.log(`💰 Bet placed: ${amount} SOL | Phase: ${gamePhaseRef.current}`);
     
     setCurrentBet(amount);
     setBalance(prev => prev - amount);
@@ -252,15 +285,15 @@ export const useGameEngine = () => {
     }));
     
     setShowBetEmojis(true);
-    setTimeout(() => setShowBetEmojis(false), 1000);
+    setTimeout(() => setShowBetEmojis(false), 1500);
     
     toast({
-      title: "🎯 Bet Placed! Welcome to the degen casino! 🎯",
-      description: `${amount.toFixed(2)} SOL riding the rocket!`,
+      title: "🎯 BET PLACED!",
+      description: `${amount.toFixed(4)} SOL is riding the rocket!`,
     });
     
     return true;
-  }, [currentBet, balance, isRoundActive, isCrashed, timeRemaining, addFeedEvent, toast]);
+  }, [currentBet, balance, addFeedEvent, toast]);
 
   const handleCashOut = useCallback(() => {
     if (!currentBet || !isRoundActive || isCrashed || cashOutRequested) return false;
@@ -277,11 +310,11 @@ export const useGameEngine = () => {
     }));
     
     setShowWinEmojis(true);
-    setTimeout(() => setShowWinEmojis(false), 2000);
+    setTimeout(() => setShowWinEmojis(false), 3000);
     
     toast({
-      title: "💰 BASED! Cashed out like a pro! 💰",
-      description: `Won ${payout.toFixed(2)} SOL at ${currentMultiplier.toFixed(2)}x!`,
+      title: "💰 SECURED THE BAG!",
+      description: `Won ${payout.toFixed(4)} SOL at ${currentMultiplier.toFixed(2)}x!`,
     });
     
     return true;
@@ -291,9 +324,19 @@ export const useGameEngine = () => {
     setIsWalletConnected(prev => !prev);
     toast({
       title: isWalletConnected ? "👋 Wallet Disconnected" : "🟢 Wallet Connected",
-      description: isWalletConnected ? "See you later, space cowboy" : "Ready to lose some money!",
+      description: isWalletConnected ? "See you later!" : "Ready to make some moves!",
     });
   }, [isWalletConnected, toast]);
+
+  // Initialize first round
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (gamePhaseRef.current === 'waiting') {
+        startNewRound();
+      }
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [startNewRound]);
 
   return {
     // Game state

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -13,168 +13,191 @@ export const MultiplierDisplay = ({
   isActive, 
   isCrashed 
 }: MultiplierDisplayProps) => {
-  const [displayMultiplier, setDisplayMultiplier] = useState(1.00);
-  const [rockets, setRockets] = useState<string[]>([]);
+  const [displayMultiplier, setDisplayMultiplier] = useState(currentMultiplier);
+  const [isAnimating, setIsAnimating] = useState(false);
 
+  // Ultra-smooth number animation
   useEffect(() => {
     if (isActive && !isCrashed) {
-      setDisplayMultiplier(currentMultiplier);
-      
-      // Add rockets as multiplier grows
-      if (currentMultiplier > 2 && currentMultiplier % 0.5 < 0.01) {
-        setRockets(prev => [...prev, '🚀'].slice(-5));
-      }
+      setIsAnimating(true);
+      const interval = setInterval(() => {
+        setDisplayMultiplier(prev => {
+          const diff = currentMultiplier - prev;
+          if (Math.abs(diff) < 0.001) return currentMultiplier;
+          return prev + (diff * 0.3); // Smooth interpolation
+        });
+      }, 16); // 60fps
+
+      return () => clearInterval(interval);
     } else {
-      setRockets([]);
+      setDisplayMultiplier(currentMultiplier);
+      setIsAnimating(false);
     }
   }, [currentMultiplier, isActive, isCrashed]);
 
-  const getDisplayClass = () => {
-    if (isCrashed) {
-      return "text-neon-red animate-crash-pulse drop-shadow-[0_0_20px_rgba(239,68,68,0.8)]";
-    }
-    if (isActive) {
-      const intensity = Math.min(currentMultiplier / 5, 1);
-      return `text-neon-green animate-glow drop-shadow-[0_0_${20 + intensity * 30}px_rgba(34,197,94,${0.5 + intensity * 0.5})]`;
-    }
-    return "text-muted-foreground";
+  const getMultiplierColor = () => {
+    if (isCrashed) return "text-red-400";
+    if (currentMultiplier >= 10) return "text-yellow-400";
+    if (currentMultiplier >= 5) return "text-orange-400";
+    if (currentMultiplier >= 2) return "text-green-400";
+    return "text-blue-400";
   };
 
-  const getCardClass = () => {
-    if (isCrashed) {
-      return "border-neon-red shadow-neon-red bg-gradient-to-br from-red-950/20 to-red-900/10 retro-crt";
-    }
-    if (isActive) {
-      const pulse = currentMultiplier > 3 ? "animate-pulse-neon" : "";
-      return `border-neon-green shadow-neon-green bg-gradient-to-br from-green-950/20 to-green-900/10 cyber-grid ${pulse}`;
-    }
-    return "border-border cyber-grid";
+  const getGlowEffect = () => {
+    if (isCrashed) return "drop-shadow-[0_0_20px_rgba(239,68,68,0.8)] animate-crash-pulse";
+    if (isActive && currentMultiplier >= 5) return "drop-shadow-[0_0_30px_rgba(251,191,36,0.8)] animate-glow";
+    if (isActive) return "drop-shadow-[0_0_20px_rgba(34,197,94,0.6)] animate-pulse";
+    return "drop-shadow-[0_0_10px_rgba(59,130,246,0.4)]";
   };
 
-  const getMultiplierSize = () => {
-    if (currentMultiplier > 10) return "text-9xl";
-    if (currentMultiplier > 5) return "text-8xl";
-    return "text-7xl";
+  const getRocketEmoji = () => {
+    if (isCrashed) return "💥";
+    if (currentMultiplier >= 20) return "🌙";
+    if (currentMultiplier >= 10) return "🚀";
+    if (currentMultiplier >= 5) return "✈️";
+    if (currentMultiplier >= 2) return "📈";
+    return "🎯";
+  };
+
+  const getPressureLevel = () => {
+    if (currentMultiplier < 1.5) return "SAFE ZONE";
+    if (currentMultiplier < 2) return "CAUTION";
+    if (currentMultiplier < 5) return "DANGER ZONE";
+    if (currentMultiplier < 10) return "HIGH RISK";
+    return "EXTREME DANGER";
+  };
+
+  const getPressureColor = () => {
+    if (currentMultiplier < 1.5) return "text-green-400 border-green-400/30";
+    if (currentMultiplier < 2) return "text-yellow-400 border-yellow-400/30";
+    if (currentMultiplier < 5) return "text-orange-400 border-orange-400/30";
+    if (currentMultiplier < 10) return "text-red-400 border-red-400/30";
+    return "text-purple-400 border-purple-400/30 animate-crash-pulse";
   };
 
   return (
-    <Card className={`relative p-8 text-center transition-all duration-300 overflow-hidden ${getCardClass()}`}>
-      {/* Particle effects background */}
-      <div className="absolute inset-0 pointer-events-none">
-        {isActive && !isCrashed && (
-          <>
-            {/* Rising particles */}
-            {Array.from({ length: 20 }).map((_, i) => (
+    <div className="space-y-6">
+      {/* Main Multiplier Display */}
+      <Card className="relative p-8 bg-gradient-to-br from-black/80 via-gray-900/60 to-black/90 backdrop-blur-xl border-2 border-neon-green/20 overflow-hidden">
+        {/* Background effects */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-neon-green/5 to-transparent animate-pulse" />
+        
+        {/* Cyber grid overlay */}
+        <div className="absolute inset-0 cyber-grid opacity-20" />
+        
+        <div className="relative z-10 text-center space-y-4">
+          {/* Rocket emoji with status */}
+          <div className="text-6xl animate-bounce-scale">
+            {getRocketEmoji()}
+          </div>
+          
+          {/* Main multiplier */}
+          <div className={`text-8xl font-black font-mono ${getMultiplierColor()} ${getGlowEffect()} transition-all duration-300`}>
+            {displayMultiplier.toFixed(2)}
+            <span className="text-4xl">x</span>
+          </div>
+          
+          {/* Status message */}
+          <div className="space-y-2">
+            {isCrashed ? (
+              <div className="text-2xl font-black text-red-400 animate-crash-pulse">
+                💀 LIQUIDATED! 💀
+              </div>
+            ) : isActive ? (
+              <div className="text-xl font-bold text-green-400 animate-pulse">
+                🚀 TO THE MOON! 🚀
+              </div>
+            ) : (
+              <div className="text-lg font-bold text-yellow-400">
+                ⏳ Preparing for launch...
+              </div>
+            )}
+            
+            {/* Pressure indicator */}
+            {isActive && (
+              <Badge variant="outline" className={`${getPressureColor()} font-mono text-sm px-4 py-2`}>
+                ⚠️ {getPressureLevel()}
+              </Badge>
+            )}
+          </div>
+        </div>
+
+        {/* Particle effects */}
+        {isActive && currentMultiplier > 2 && (
+          <div className="absolute inset-0 pointer-events-none">
+            {Array.from({ length: Math.min(20, Math.floor(currentMultiplier * 2)) }).map((_, i) => (
               <div
                 key={i}
-                className="absolute w-1 h-1 bg-neon-green rounded-full animate-ping"
+                className={`absolute w-1 h-1 rounded-full animate-ping ${
+                  currentMultiplier > 10 ? 'bg-purple-400' :
+                  currentMultiplier > 5 ? 'bg-yellow-400' : 'bg-green-400'
+                }`}
                 style={{
                   left: `${Math.random() * 100}%`,
                   top: `${Math.random() * 100}%`,
                   animationDelay: `${Math.random() * 2}s`,
-                  animationDuration: `${1 + Math.random()}s`
+                  animationDuration: `${0.5 + Math.random()}s`
                 }}
               />
             ))}
-          </>
-        )}
-      </div>
-
-      <div className="relative space-y-4">
-        {/* Rocket trail */}
-        {rockets.length > 0 && (
-          <div className="flex justify-center items-center gap-2 mb-2">
-            {rockets.map((rocket, i) => (
-              <span 
-                key={i} 
-                className="text-2xl animate-bounce"
-                style={{ animationDelay: `${i * 100}ms` }}
-              >
-                {rocket}
-              </span>
-            ))}
           </div>
         )}
+      </Card>
 
-        <div className={`${getMultiplierSize()} font-black tracking-tight ${getDisplayClass()} relative`}>
+      {/* Secondary stats panel */}
+      <div className="grid grid-cols-3 gap-4">
+        <Card className="p-4 bg-black/40 backdrop-blur-sm border border-border">
+          <div className="text-center space-y-2">
+            <div className="text-xs text-muted-foreground">CURRENT</div>
+            <div className="text-lg font-bold text-white font-mono">
+              {currentMultiplier.toFixed(3)}x
+            </div>
+          </div>
+        </Card>
+        
+        <Card className="p-4 bg-black/40 backdrop-blur-sm border border-border">
+          <div className="text-center space-y-2">
+            <div className="text-xs text-muted-foreground">STATUS</div>
+            <div className={`text-sm font-bold ${
+              isCrashed ? 'text-red-400' : isActive ? 'text-green-400' : 'text-yellow-400'
+            }`}>
+              {isCrashed ? 'CRASHED' : isActive ? 'LIVE' : 'WAITING'}
+            </div>
+          </div>
+        </Card>
+        
+        <Card className="p-4 bg-black/40 backdrop-blur-sm border border-border">
+          <div className="text-center space-y-2">
+            <div className="text-xs text-muted-foreground">RISK</div>
+            <div className={`text-sm font-bold ${
+              currentMultiplier < 2 ? 'text-green-400' :
+              currentMultiplier < 5 ? 'text-yellow-400' : 'text-red-400'
+            }`}>
+              {currentMultiplier < 2 ? 'LOW' :
+               currentMultiplier < 5 ? 'HIGH' : 'EXTREME'}
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Fun motivational messages */}
+      <Card className="p-4 bg-gradient-to-r from-purple-950/30 to-pink-950/30 backdrop-blur-sm border border-purple-500/20">
+        <div className="text-center text-sm text-purple-300">
           {isCrashed ? (
-            <div className="space-y-2">
-              <div className="text-6xl">💥 CRASHED! 💥</div>
-              <div className="text-4xl font-bold">
-                {displayMultiplier.toFixed(2)}x
-              </div>
-            </div>
+            "💀 RIP your bags! Better luck next time, degen! 💀"
+          ) : currentMultiplier > 10 ? (
+            "🌙 Moon mission successful! You're a legend! 🌙"
+          ) : currentMultiplier > 5 ? (
+            "🚀 Houston, we have liftoff! Diamond hands! 💎"
+          ) : currentMultiplier > 2 ? (
+            "📈 Gains are gains! But can you hold longer? 🤔"
+          ) : isActive ? (
+            "🎯 Just getting started! HODL for the moon! 🚀"
           ) : (
-            <div className="relative">
-              <span className="relative z-10">
-                {displayMultiplier.toFixed(2)}x
-              </span>
-              {isActive && currentMultiplier > 2 && (
-                <div className="absolute inset-0 animate-ping">
-                  <span className="opacity-30">
-                    {displayMultiplier.toFixed(2)}x
-                  </span>
-                </div>
-              )}
-            </div>
+            "🎲 Ready to lose some money? Let's gooo! 🔥"
           )}
         </div>
-        
-        {/* Status messages with more personality */}
-        {isActive && !isCrashed && (
-          <div className="space-y-2">
-            <div className="text-lg text-neon-green font-bold animate-bounce">
-              🔥 TO THE MOON! CASH OUT NOW! 🔥
-            </div>
-            <div className="text-sm text-muted-foreground">
-              {currentMultiplier > 5 ? "🚨 DANGER ZONE! 🚨" : 
-               currentMultiplier > 3 ? "💎 DIAMOND HANDS? 💎" : 
-               "📈 Building momentum..."}
-            </div>
-          </div>
-        )}
-        
-        {isCrashed && (
-          <div className="space-y-2">
-            <div className="text-lg text-destructive-foreground animate-pulse font-bold">
-              😭 GET REKT! BETTER LUCK NEXT TIME! 😭
-            </div>
-            <Badge variant="destructive" className="animate-bounce">
-              💸 FUNDS ARE SAFU... OR ARE THEY? 💸
-            </Badge>
-          </div>
-        )}
-        
-        {!isActive && !isCrashed && (
-          <div className="space-y-2">
-            <div className="text-lg text-neon-blue font-bold animate-pulse">
-              🎲 GET READY TO LOSE YOUR MONEY! 🎲
-            </div>
-            <div className="text-sm text-muted-foreground">
-              🚀 Next rocket launching soon... 🚀
-            </div>
-          </div>
-        )}
-
-        {/* Multiplier milestones */}
-        {isActive && !isCrashed && (
-          <div className="flex justify-center gap-2 mt-4">
-            {[2, 5, 10, 20, 50].map((milestone) => (
-              <Badge
-                key={milestone}
-                variant={currentMultiplier >= milestone ? "default" : "outline"}
-                className={`text-xs ${
-                  currentMultiplier >= milestone 
-                    ? "bg-neon-green text-black animate-pulse" 
-                    : "opacity-50"
-                }`}
-              >
-                {milestone}x
-              </Badge>
-            ))}
-          </div>
-        )}
-      </div>
-    </Card>
+      </Card>
+    </div>
   );
 };

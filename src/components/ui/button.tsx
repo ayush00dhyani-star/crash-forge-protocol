@@ -5,28 +5,38 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline:
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        
         // Gaming-specific variants
-        neon: "bg-gradient-primary text-primary-foreground shadow-neon-green hover:shadow-neon-green/80 hover:scale-105 border border-neon-green/30",
-        crash: "bg-gradient-danger text-destructive-foreground shadow-neon-red hover:shadow-neon-red/80 hover:scale-105 border border-neon-red/30 animate-pulse-neon",
-        cashout: "bg-neon-green text-black shadow-neon-green hover:bg-neon-green/90 hover:shadow-neon-green/80 hover:scale-105 font-bold border border-neon-green/50",
-        bet: "bg-neon-blue text-white shadow-neon-blue hover:bg-neon-blue/90 hover:shadow-neon-blue/80 hover:scale-105 font-semibold border border-neon-blue/50",
-        game: "bg-secondary/50 text-foreground border border-border hover:bg-secondary/70 hover:border-primary/50 backdrop-blur-sm",
+        neon: "bg-gradient-to-r from-neon-green via-neon-blue to-neon-green bg-[length:200%_100%] text-black font-black border-2 border-neon-green/50 hover:bg-[position:100%_0%] hover:shadow-neon-green hover:scale-105 active:scale-95 transition-all duration-300 animate-pulse-neon",
+        
+        bet: "bg-gradient-to-r from-neon-blue via-neon-purple to-neon-blue bg-[length:200%_100%] text-white font-black border-2 border-neon-blue/50 hover:bg-[position:100%_0%] hover:shadow-neon-blue hover:scale-105 active:scale-95 transition-all duration-300",
+        
+        cashout: "bg-gradient-to-r from-neon-green via-green-400 to-neon-green bg-[length:200%_100%] text-black font-black border-2 border-neon-green/50 hover:bg-[position:100%_0%] hover:shadow-neon-green hover:scale-110 active:scale-95 transition-all duration-200 animate-bounce-scale",
+        
+        crash: "bg-gradient-to-r from-neon-red via-red-500 to-neon-red bg-[length:200%_100%] text-white font-black border-2 border-neon-red/50 hover:bg-[position:100%_0%] hover:shadow-neon-red animate-crash-pulse",
+        
+        premium: "bg-gradient-to-r from-neon-purple via-neon-yellow to-neon-purple bg-[length:200%_100%] text-black font-black border-2 border-neon-purple/50 hover:bg-[position:100%_0%] hover:shadow-[0_0_30px_rgba(168,85,247,0.6)] hover:scale-105 active:scale-95 transition-all duration-300",
+        
+        retro: "bg-black/80 text-neon-green border-2 border-neon-green/50 font-mono hover:bg-neon-green/10 hover:shadow-neon-green hover:text-neon-green transition-all duration-200 retro-crt"
       },
       size: {
         default: "h-10 px-4 py-2",
         sm: "h-9 rounded-md px-3",
         lg: "h-11 rounded-md px-8",
-        xl: "h-12 rounded-lg px-10 text-base",
+        xl: "h-14 rounded-lg px-12 text-lg",
         icon: "h-10 w-10",
       },
     },
@@ -34,8 +44,8 @@ const buttonVariants = cva(
       variant: "default",
       size: "default",
     },
-  },
-);
+  }
+)
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
