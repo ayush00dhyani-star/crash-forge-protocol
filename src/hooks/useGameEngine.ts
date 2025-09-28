@@ -57,6 +57,7 @@ export const useGameEngine = () => {
   const crashPointRef = useRef<number>(0);
   const multiplierIntervalRef = useRef<NodeJS.Timeout>();
   const gamePhaseRef = useRef<'waiting' | 'countdown' | 'active' | 'crashed'>('waiting');
+  const growthRateRef = useRef<number>(1.0022);
 
   // Ultra-advanced crash point calculation with quantum randomness simulation
   const calculateCrashPoint = useCallback((roundId: number): number => {
@@ -90,11 +91,11 @@ export const useGameEngine = () => {
     
     // Weighted distribution for realistic crash points
     const weights = [
-      { max: 1.5, weight: 0.35, multiplier: 0.8 },   // 35% crash before 1.5x
-      { max: 3.0, weight: 0.25, multiplier: 1.2 },   // 25% crash 1.5x-3x
-      { max: 10.0, weight: 0.20, multiplier: 1.8 },  // 20% crash 3x-10x
-      { max: 50.0, weight: 0.15, multiplier: 2.5 },  // 15% crash 10x-50x
-      { max: 1000, weight: 0.05, multiplier: 5.0 },  // 5% moon shots
+      { max: 1.5, weight: 0.28, multiplier: 0.9 },   // 28% crash before 1.5x
+      { max: 3.0, weight: 0.24, multiplier: 1.2 },   // 24% crash 1.5x-3x
+      { max: 10.0, weight: 0.22, multiplier: 1.6 },  // 22% crash 3x-10x
+      { max: 50.0, weight: 0.20, multiplier: 2.1 },  // 20% crash 10x-50x
+      { max: 1000, weight: 0.06, multiplier: 2.8 },  // 6% moon shots
     ];
     
     let cumulative = 0;
@@ -102,7 +103,7 @@ export const useGameEngine = () => {
       cumulative += tier.weight;
       if (normalized <= cumulative) {
         const tierRandom = (normalized - (cumulative - tier.weight)) / tier.weight;
-        const base = tier.max === 1.5 ? 1.01 : (tier.max / 5);
+        const base = 1.01;
         const range = tier.max - base;
         const crash = base + (Math.pow(tierRandom, tier.multiplier) * range);
         return Math.max(1.01, Math.min(1000, Math.round(crash * 100) / 100));
@@ -121,7 +122,7 @@ export const useGameEngine = () => {
 
     setCurrentMultiplier(prev => {
       // Professional-grade exponential curve with micro-adjustments
-      const baseGrowth = Math.pow(1.0024, elapsed); // Ultra-smooth base
+      const baseGrowth = Math.pow(growthRateRef.current, elapsed); // Ultra-smooth base with per-round pacing
       const acceleration = 1 + (seconds * 0.0008); // Gentle acceleration
       const microVariation = 1 + (Math.sin(elapsed * 0.01) * 0.0001); // Tiny variations
       
@@ -161,9 +162,10 @@ export const useGameEngine = () => {
         }));
         
         // Auto-start next round
+        const delay = 600 + Math.random() * 800;
         setTimeout(() => {
           startNewRound();
-        }, 2000);
+        }, delay);
         
         return crashPointRef.current;
       }
@@ -217,11 +219,13 @@ export const useGameEngine = () => {
     
     console.log(`🚀 Round #${roundId} - Target: ${newCrashPoint.toFixed(2)}x`);
     
-    setIsRoundActive(true);
+     setIsRoundActive(true);
     setIsCrashed(false);
     setCurrentMultiplier(1.00);
     setCashOutRequested(false);
     roundStartTimeRef.current = Date.now();
+    // Per-round randomized growth rate to vary run duration and feel
+    growthRateRef.current = 1.0015 + Math.random() * 0.0015;
     
     // Generate realistic bot activity
     setTimeout(() => {
@@ -250,7 +254,7 @@ export const useGameEngine = () => {
   const startNewRound = useCallback(() => {
     gamePhaseRef.current = 'countdown';
     setRoundId(prev => prev + 1);
-    setTimeRemaining(Math.floor(Math.random() * 3) + 2); // 2-4 seconds
+    setTimeRemaining(Math.floor(Math.random() * 2) + 1); // 1-2 seconds
     setCurrentBet(null);
     setCashOutRequested(false);
     setCrashPoint(0);

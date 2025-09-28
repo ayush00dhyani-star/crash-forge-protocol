@@ -87,7 +87,7 @@ export const CrashChart = ({
     if (chartData.length === 0) return;
 
     // Dynamic bounds calculation
-    const maxTime = Math.max(...chartData.map(p => p.time));
+    const maxTime = Math.max(...chartData.map(p => p.time)) + 400;
     const maxMultiplier = Math.max(2.0, Math.max(...chartData.map(p => p.multiplier)) * 1.1);
     const minMultiplier = 1.0;
 
@@ -133,9 +133,9 @@ export const CrashChart = ({
     }
 
     // Ultra-smooth curve rendering with advanced effects
-    if (chartData.length > 1) {
-      // Dynamic color based on multiplier and state
-      const baseHue = isCrashed ? 0 : currentMultiplier > 5 ? 45 : currentMultiplier > 2 ? 142 : 217;
+     if (chartData.length > 1) {
+       // Dynamic color based on multiplier and state
+       const baseHue = isCrashed ? 0 : currentMultiplier > 5 ? 45 : currentMultiplier > 2 ? 142 : 217;
       const saturation = Math.min(100, 60 + (currentMultiplier - 1) * 10);
       const lightness = Math.min(70, 45 + (currentMultiplier - 1) * 5);
       
@@ -239,6 +239,19 @@ export const CrashChart = ({
 
     // Professional crash overlay
     if (isCrashed && crashPoint) {
+      // Draw vertical drop line to baseline for dramatic crash
+      const lastPoint = chartData[chartData.length - 1];
+      if (lastPoint) {
+        const currentX = padding + (lastPoint.time / Math.max(1, maxTime)) * chartWidth;
+        const currentY = padding + chartHeight - ((lastPoint.multiplier - minMultiplier) / Math.max(0.001, (maxMultiplier - minMultiplier))) * chartHeight;
+        ctx.strokeStyle = 'rgba(239, 68, 68, 0.9)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(currentX, currentY);
+        ctx.lineTo(currentX, padding + chartHeight);
+        ctx.stroke();
+      }
+
       // Dramatic explosion effect
       ctx.fillStyle = 'rgba(239, 68, 68, 0.9)';
       ctx.font = 'bold 24px "JetBrains Mono", monospace';
