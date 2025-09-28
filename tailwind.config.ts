@@ -47,30 +47,34 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Gaming-specific neon colors
-        neon: {
-          green: "hsl(var(--neon-green))",
-          blue: "hsl(var(--neon-blue))",
-          red: "hsl(var(--neon-red))",
-          purple: "hsl(var(--neon-purple))",
-          yellow: "hsl(var(--neon-yellow))",
+        success: "hsl(var(--success))",
+        warning: "hsl(var(--warning))",
+        info: "hsl(var(--info))",
+        surface: {
+          1: "hsl(var(--surface-1))",
+          2: "hsl(var(--surface-2))",
+          3: "hsl(var(--surface-3))",
         },
+      },
+      fontFamily: {
+        sans: ["Inter", "system-ui", "sans-serif"],
+        mono: ["JetBrains Mono", "Fira Code", "Monaco", "monospace"],
       },
       backgroundImage: {
         "gradient-primary": "var(--gradient-primary)",
-        "gradient-danger": "var(--gradient-danger)",
-        "gradient-game": "var(--gradient-game)",
-        "gradient-neon": "var(--gradient-neon)",
+        "gradient-success": "var(--gradient-success)",
+        "gradient-surface": "var(--gradient-surface)",
+        "gradient-chart": "var(--gradient-chart)",
       },
       boxShadow: {
-        "neon-green": "var(--shadow-neon-green)",
-        "neon-blue": "var(--shadow-neon-blue)",
-        "neon-red": "var(--shadow-neon-red)",
-        "game": "var(--shadow-game)",
+        sm: "var(--shadow-sm)",
+        md: "var(--shadow-md)",
+        lg: "var(--shadow-lg)",
+        xl: "var(--shadow-xl)",
       },
       transitionTimingFunction: {
-        "smooth": "var(--transition-smooth)",
-        "bounce": "var(--transition-bounce)",
+        smooth: "var(--transition-smooth)",
+        spring: "var(--transition-spring)",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -79,67 +83,48 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
-        "pulse-neon": {
-          "0%, 100%": {
-            boxShadow: "0 0 20px hsl(var(--neon-green) / 0.5)",
-          },
-          "50%": {
-            boxShadow: "0 0 30px hsl(var(--neon-green) / 0.8), 0 0 40px hsl(var(--neon-green) / 0.4)",
-          },
+        "fade-in": {
+          "0%": { opacity: "0", transform: "translateY(10px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
         },
-        "glow": {
-          "0%, 100%": {
-            textShadow: "0 0 20px currentColor",
-          },
-          "50%": {
-            textShadow: "0 0 30px currentColor, 0 0 40px currentColor",
-          },
+        "slide-up": {
+          "0%": { transform: "translateY(100%)" },
+          "100%": { transform: "translateY(0)" },
         },
-        "bounce-scale": {
-          "0%, 100%": {
-            transform: "scale(1)",
-          },
-          "50%": {
-            transform: "scale(1.05)",
-          },
+        "chart-draw": {
+          "0%": { strokeDashoffset: "1000" },
+          "100%": { strokeDashoffset: "0" },
         },
-        "crash-pulse": {
-          "0%": {
-            transform: "scale(1)",
-            boxShadow: "0 0 0 0 hsl(var(--neon-red) / 0.7)",
-          },
-          "70%": {
-            transform: "scale(1.1)",
-            boxShadow: "0 0 0 20px hsl(var(--neon-red) / 0)",
-          },
-          "100%": {
-            transform: "scale(1)",
-            boxShadow: "0 0 0 0 hsl(var(--neon-red) / 0)",
-          },
+        "value-change": {
+          "0%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.05)" },
+          "100%": { transform: "scale(1)" },
+        },
+        "pulse-success": {
+          "0%, 100%": { boxShadow: "0 0 0 0 hsl(var(--success) / 0.4)" },
+          "70%": { boxShadow: "0 0 0 10px hsl(var(--success) / 0)" },
+        },
+        "pulse-danger": {
+          "0%, 100%": { boxShadow: "0 0 0 0 hsl(var(--destructive) / 0.4)" },
+          "70%": { boxShadow: "0 0 0 10px hsl(var(--destructive) / 0)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "pulse-neon": "pulse-neon 2s ease-in-out infinite",
-        "glow": "glow 2s ease-in-out infinite",
-        "bounce-scale": "bounce-scale 0.6s ease-in-out infinite",
-        "crash-pulse": "crash-pulse 1s ease-out infinite",
+        "fade-in": "fade-in 0.3s ease-out",
+        "slide-up": "slide-up 0.3s ease-out",
+        "chart-draw": "chart-draw 1.5s ease-out",
+        "value-change": "value-change 0.3s ease-out",
+        "pulse-success": "pulse-success 2s infinite",
+        "pulse-danger": "pulse-danger 2s infinite",
       },
     },
   },

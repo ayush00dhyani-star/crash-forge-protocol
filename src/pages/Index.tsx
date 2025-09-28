@@ -1,296 +1,158 @@
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { MultiplierDisplay } from "@/components/MultiplierDisplay";
+import { useGameEngine } from "@/hooks/useGameEngine";
+import { TradingChart } from "@/components/TradingChart";
+import { MultiplierPanel } from "@/components/MultiplierPanel";
+import { ActivityFeed } from "@/components/ActivityFeed";
 import { BetPanel } from "@/components/BetPanel";
 import { GameStats } from "@/components/GameStats";
-import { LiveFeed } from "@/components/LiveFeed";
-import { GameChat } from "@/components/GameChat";
-import { MatrixRain } from "@/components/MatrixRain";
-import { FloatingEmojis } from "@/components/FloatingEmojis";
-import { CrashChart } from "@/components/CrashChart";
-import { RoundTimer } from "@/components/RoundTimer";
-import { SoundEffects } from "@/components/SoundEffects";
-import { AdvancedStats } from "@/components/AdvancedStats";
-import { useGameEngine } from "@/hooks/useGameEngine";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { TrendingUp, Users, BarChart3 } from "lucide-react";
 
 const Index = () => {
   const {
-    // Game state
     currentMultiplier,
     isRoundActive,
     isCrashed,
     roundId,
     timeRemaining,
     crashPoint,
-    
-    // Player state
     currentBet,
     balance,
     isWalletConnected,
+    cashOutRequested,
     autoCashOut,
     setAutoCashOut,
-    
-    // Game data
     feedEvents,
     roundHistory,
     gameStats,
-    
-    // Effects
-    showWinEmojis,
-    showLossEmojis,
-    showBetEmojis,
-    
-    // Actions
     handlePlaceBet,
     handleCashOut,
     toggleWallet,
-    
-    // Utils
     canCashOut,
     hasActiveBet
   } = useGameEngine();
 
   return (
-    <div className="min-h-screen bg-gradient-game relative overflow-hidden">
-      {/* Matrix Rain Background */}
-      <MatrixRain />
-      
-      {/* Floating Emojis */}
-      <FloatingEmojis trigger={showWinEmojis} type="win" />
-      <FloatingEmojis trigger={showLossEmojis} type="loss" />
-      <FloatingEmojis trigger={showBetEmojis} type="bet" />
-
-      {/* Sound Effects */}
-      <SoundEffects
-        playBetSound={showBetEmojis}
-        playCashoutSound={showWinEmojis}
-        playCrashSound={showLossEmojis}
-        playTickSound={isRoundActive && currentMultiplier > 1.0}
-      />
-
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border bg-black/20 backdrop-blur-xl relative z-10">
-        <div className="container mx-auto px-4 py-6">
+      <header className="border-b border-border bg-card/50 backdrop-blur-lg sticky top-0 z-50">
+        <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <h1 className="text-4xl font-black bg-gradient-neon bg-clip-text text-transparent animate-glow">
-                💥 MEME CRASH 💥
-              </h1>
-              <Badge variant="outline" className="bg-red-500/30 text-red-400 border-red-500/50 animate-pulse">
-                🔴 LIVE DESTRUCTION
-              </Badge>
-              <Badge variant="outline" className="bg-yellow-500/30 text-yellow-400 border-yellow-500/50">
-                ⚠️ NOT FINANCIAL ADVICE
+            <div className="flex items-center gap-3">
+              <TrendingUp className="h-8 w-8 text-primary" />
+              <div>
+                <h1 className="text-2xl font-bold">Crash Trading</h1>
+                <p className="text-sm text-muted-foreground">Professional multiplier platform</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-4">
+                <div className="text-right">
+                  <div className="text-xs text-muted-foreground uppercase tracking-wide">Round</div>
+                  <div className="text-lg font-bold number-mono">#{roundId}</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-xs text-muted-foreground uppercase tracking-wide">Players</div>
+                  <div className="text-lg font-bold number-mono">{gameStats.totalPlayers.toLocaleString()}</div>
+                </div>
+              </div>
+              
+              <Badge 
+                variant={isWalletConnected ? "default" : "secondary"}
+                className="px-4 py-2 cursor-pointer"
+                onClick={toggleWallet}
+              >
+                {isWalletConnected ? "Connected" : "Connect Wallet"}
               </Badge>
             </div>
-            <Button 
-              variant="neon" 
-              size="xl"
-              onClick={toggleWallet}
-              className="font-black"
-            >
-              {isWalletConnected ? "🟢 WALLET CONNECTED" : "🔌 CONNECT WALLET"}
-            </Button>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 space-y-8">
-        {/* Advanced Stats & Timer */}
-        <div className="grid lg:grid-cols-4 gap-6">
-          <div className="lg:col-span-3">
-            <AdvancedStats 
-              gameStats={gameStats} 
-              roundHistory={roundHistory}
-              currentMultiplier={currentMultiplier}
-              isActive={isRoundActive}
-            />
-          </div>
-          <div>
-            <RoundTimer
-              timeRemaining={timeRemaining}
-              isRoundActive={isRoundActive}
-              isCrashed={isCrashed}
-              roundId={roundId}
-            />
-          </div>
-        </div>
-
-        {/* Main Game Area */}
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Chart and Multiplier Display */}
-          <div className="lg:col-span-2 space-y-6">
-            <CrashChart
+      {/* Main Content */}
+      <main className="container mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+          {/* Chart Section */}
+          <div className="xl:col-span-3 space-y-6">
+            <TradingChart
               currentMultiplier={currentMultiplier}
               isActive={isRoundActive}
               isCrashed={isCrashed}
               crashPoint={crashPoint}
             />
             
-            <MultiplierDisplay
+            {/* Stats Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="p-4 glass">
+                <div className="flex items-center gap-3">
+                  <BarChart3 className="h-8 w-8 text-primary" />
+                  <div>
+                    <div className="text-sm text-muted-foreground">Total Volume</div>
+                    <div className="text-xl font-bold number-mono">
+                      {gameStats.totalBets.toLocaleString()} SOL
+                    </div>
+                  </div>
+                </div>
+              </Card>
+              
+              <Card className="p-4 glass">
+                <div className="flex items-center gap-3">
+                  <TrendingUp className="h-8 w-8 text-success" />
+                  <div>
+                    <div className="text-sm text-muted-foreground">Biggest Win</div>
+                    <div className="text-xl font-bold number-mono">
+                      {gameStats.biggestWin.toLocaleString()} SOL
+                    </div>
+                  </div>
+                </div>
+              </Card>
+              
+              <Card className="p-4 glass">
+                <div className="flex items-center gap-3">
+                  <Users className="h-8 w-8 text-info" />
+                  <div>
+                    <div className="text-sm text-muted-foreground">Active Players</div>
+                    <div className="text-xl font-bold number-mono">
+                      {gameStats.totalPlayers.toLocaleString()}
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            <MultiplierPanel
               currentMultiplier={currentMultiplier}
               isActive={isRoundActive}
               isCrashed={isCrashed}
+              timeRemaining={timeRemaining}
             />
-          </div>
-
-          {/* Bet Panel */}
-          <div className="space-y-6">
+            
             <BetPanel
-              isRoundActive={isRoundActive}
-              onPlaceBet={handlePlaceBet}
-              onCashOut={handleCashOut}
-              currentBet={currentBet}
-              hasActiveBet={hasActiveBet}
-              canCashOut={canCashOut}
               balance={balance}
+              currentBet={currentBet}
+              isRoundActive={isRoundActive}
+              canCashOut={canCashOut}
+              hasActiveBet={hasActiveBet}
               autoCashOut={autoCashOut}
               setAutoCashOut={setAutoCashOut}
+              onPlaceBet={handlePlaceBet}
+              onCashOut={handleCashOut}
               currentMultiplier={currentMultiplier}
             />
-
-            {/* Live Feed & Chat */}
-            <div className="space-y-6">
-              <LiveFeed events={feedEvents} />
-              <GameChat isConnected={isWalletConnected} />
-            </div>
           </div>
         </div>
 
-        {/* Meme Sections */}
-        <div className="grid md:grid-cols-3 gap-6">
-          <Card className="p-6 bg-gradient-to-br from-green-950/30 to-green-900/20 backdrop-blur-sm border-neon-green/30 retro-crt">
-            <h3 className="text-lg font-black mb-4 text-center text-neon-green">🎮 HOW TO GET REKT</h3>
-            <div className="space-y-2 text-sm text-green-300">
-              <p>• YOLO your life savings before the round starts 🎯</p>
-              <p>• Watch the multiplier moon from 1.00x 📈</p>
-              <p>• Cash out before it crashes to actually win! 💰</p>
-              <p>• The longer you wait, the more you'll lose 🔥</p>
-              <p>• Diamond hands usually get REKT 💎🙌💀</p>
-              <p>• Your wife's boyfriend is laughing 😂</p>
-            </div>
-          </Card>
-
-          <Card className="p-6 bg-gradient-to-br from-red-950/30 to-red-900/20 backdrop-blur-sm border-neon-red/30 retro-crt">
-            <h3 className="text-lg font-black mb-4 text-center text-neon-red">💀 RECENT CASUALTIES</h3>
-            <div className="space-y-2">
-              {roundHistory.slice(0, 5).map((result, index) => {
-                const mockRekt = Math.floor(Math.random() * 100) + 10;
-                return (
-                  <div key={result.id} className="flex justify-between items-center p-2 bg-black/30 rounded">
-                    <span className="text-xs text-red-300">Round #{result.id}</span>
-                    <div className="text-right">
-                      <Badge 
-                        variant="outline" 
-                        className={`${result.crash > 2 ? 'text-green-400 border-green-400/30' : 'text-red-400 border-red-400/30'} text-xs`}
-                      >
-                        💥 {result.crash.toFixed(2)}x
-                      </Badge>
-                      <div className="text-xs text-red-200 mt-1">{mockRekt} degens REKT</div>
-                    </div>
-                  </div>
-                );
-              })}
-              {roundHistory.length === 0 && [
-                { round: roundId - 1, crash: 3.47, rekt: "47 degens" },
-                { round: roundId - 2, crash: 1.23, rekt: "123 paper hands" },
-                { round: roundId - 3, crash: 8.91, rekt: "12 diamond hands" },
-                { round: roundId - 4, crash: 2.15, rekt: "89 gamblers" },
-                { round: roundId - 5, crash: 1.08, rekt: "ALL OF THEM" }
-              ].map((result, index) => (
-                <div key={index} className="flex justify-between items-center p-2 bg-black/30 rounded">
-                  <span className="text-xs text-red-300">Round #{result.round}</span>
-                  <div className="text-right">
-                    <Badge 
-                      variant="outline" 
-                      className={`${result.crash > 2 ? 'text-green-400 border-green-400/30' : 'text-red-400 border-red-400/30'} text-xs`}
-                    >
-                      💥 {result.crash.toFixed(2)}x
-                    </Badge>
-                    <div className="text-xs text-red-200 mt-1">{result.rekt}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          <Card className="p-6 bg-gradient-to-br from-purple-950/30 to-purple-900/20 backdrop-blur-sm border-neon-purple/30 retro-crt">
-            <h3 className="text-lg font-black mb-4 text-center text-neon-purple">🏆 DEGEN LEADERBOARD</h3>
-            <div className="space-y-3">
-              {[
-                { rank: 1, name: "xX_MoneyLaundr_Xx", profit: "+69.420", emoji: "🐋" },
-                { rank: 2, name: "DiamondHandsDeep", profit: "+42.069", emoji: "💎" },
-                { rank: 3, name: "ToTheMoonApe", profit: "+13.37", emoji: "🚀" },
-                { rank: 4, name: "CryptoChad9000", profit: "-420.69", emoji: "💀" },
-                { rank: 5, name: "Your_Mom_69", profit: "-1337.0", emoji: "😭" }
-              ].map((player) => (
-                <div key={player.rank} className="flex items-center justify-between p-2 bg-black/30 rounded">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">{player.emoji}</span>
-                    <span className="text-xs font-mono truncate">{player.name}</span>
-                  </div>
-                  <span className={`text-xs font-bold ${
-                    player.profit.startsWith('+') ? 'text-green-400' : 'text-red-400'
-                  }`}>
-                    {player.profit} SOL
-                  </span>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </div>
-
-        {/* Bottom CTA Section */}
-        <Card className="p-8 bg-gradient-to-r from-red-950/50 via-yellow-950/50 to-red-950/50 backdrop-blur-sm border-neon-red/30 text-center">
-          <div className="space-y-4">
-            <h2 className="text-3xl font-black text-transparent bg-gradient-to-r from-red-400 via-yellow-400 to-red-400 bg-clip-text animate-glow">
-              ⚠️ FINAL WARNING ⚠️
-            </h2>
-            <p className="text-lg text-red-300 font-bold">
-              This game will literally steal your money and laugh at you while doing it.
-            </p>
-            <p className="text-sm text-red-200">
-              Seriously, go touch grass instead. Your future self will thank you.
-            </p>
-            <div className="flex justify-center gap-4 mt-6">
-              <Badge variant="destructive" className="animate-pulse">
-                💸 100% GUARANTEED LOSS
-              </Badge>
-              <Badge variant="destructive" className="animate-pulse">
-                😭 TEARS INCLUDED
-              </Badge>
-              <Badge variant="destructive" className="animate-pulse">
-                🤡 BECOME THE JOKE
-              </Badge>
-            </div>
-          </div>
-        </Card>
-
-        {/* Disclaimer */}
-        <Card className="p-6 bg-black/50 backdrop-blur-sm border-yellow-500/30 text-center">
-          <div className="space-y-2 text-yellow-300">
-            <p className="text-sm font-bold">⚠️ LEGAL DISCLAIMER ⚠️</p>
-            <p className="text-xs">
-              This is a demo implementation for educational purposes. Any resemblance to actual financial instruments is purely coincidental.
-              Past performance does not guarantee future results. Actually, nothing guarantees anything here.
-              Your capital is at risk. So is your sanity. Gamble responsibly, or don't - we're not your mom.
-            </p>
-          </div>
-        </Card>
-
-        {/* Final Footer */}
-        <div className="text-center space-y-4">
-          <div className="flex justify-center items-center gap-6 text-2xl">
-            <span className="animate-bounce">🎲</span>
-            <span className="animate-pulse">💸</span>
-            <span className="animate-bounce">😭</span>
-            <span className="animate-pulse">🤡</span>
-            <span className="animate-bounce">💀</span>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Made with 💔 by degens, for degens. Powered by Solana ⚡
-          </p>
+        {/* Bottom Section */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-8">
+          <ActivityFeed events={feedEvents} />
+          <GameStats 
+            gameStats={gameStats} 
+            roundHistory={roundHistory}
+          />
         </div>
       </main>
     </div>

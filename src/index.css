@@ -8,87 +8,90 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Dark gaming theme with neon accents */
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
+    /* Professional dark trading theme */
+    --background: 210 12% 7%;
+    --foreground: 210 8% 98%;
 
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
+    --card: 210 12% 9%;
+    --card-foreground: 210 8% 95%;
 
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 210 12% 9%;
+    --popover-foreground: 210 8% 95%;
 
-    /* Neon green primary */
-    --primary: 142 76% 36%;
-    --primary-foreground: 240 10% 3.9%;
+    /* Sophisticated blue accent */
+    --primary: 216 87% 52%;
+    --primary-foreground: 210 12% 7%;
 
-    /* Dark secondary */
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
+    /* Elevated dark surfaces */
+    --secondary: 210 10% 12%;
+    --secondary-foreground: 210 8% 88%;
 
-    --muted: 240 5.9% 10%;
-    --muted-foreground: 240 5% 64.9%;
+    --muted: 210 8% 16%;
+    --muted-foreground: 210 6% 58%;
 
-    /* Neon blue accent */
-    --accent: 217 91% 60%;
-    --accent-foreground: 240 10% 3.9%;
+    /* Professional success green */
+    --accent: 142 64% 52%;
+    --accent-foreground: 210 12% 7%;
 
-    /* Neon red for danger/crash */
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
+    /* Warning/danger red */
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 210 8% 98%;
 
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 142 76% 36%;
+    --border: 210 8% 18%;
+    --input: 210 8% 18%;
+    --ring: 216 87% 52%;
 
-    --radius: 0.5rem;
+    --radius: 8px;
 
-    /* Gaming specific colors */
-    --neon-green: 142 76% 36%;
-    --neon-green-glow: 142 76% 36%;
-    --neon-blue: 217 91% 60%;
-    --neon-red: 0 84% 60%;
-    --neon-purple: 271 91% 65%;
-    --neon-yellow: 48 96% 53%;
+    /* Professional trading colors */
+    --success: 142 64% 52%;
+    --warning: 45 93% 60%;
+    --info: 216 87% 52%;
+    --surface-1: 210 12% 9%;
+    --surface-2: 210 10% 12%;
+    --surface-3: 210 8% 16%;
     
-    /* Game specific gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 46%));
-    --gradient-danger: linear-gradient(135deg, hsl(0 84% 60%), hsl(0 84% 70%));
-    --gradient-game: linear-gradient(135deg, hsl(240 10% 3.9%), hsl(240 3.7% 15.9%));
-    --gradient-neon: linear-gradient(90deg, hsl(142 76% 36%), hsl(217 91% 60%), hsl(271 91% 65%));
+    /* Sophisticated gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(216 87% 52%), hsl(226 87% 58%));
+    --gradient-success: linear-gradient(135deg, hsl(142 64% 52%), hsl(152 64% 58%));
+    --gradient-surface: linear-gradient(135deg, hsl(210 12% 9%), hsl(210 10% 12%));
+    --gradient-chart: linear-gradient(180deg, hsl(216 87% 52% / 0.15), transparent);
     
-    /* Shadows with neon glow */
-    --shadow-neon-green: 0 0 20px hsl(142 76% 36% / 0.5);
-    --shadow-neon-blue: 0 0 20px hsl(217 91% 60% / 0.5);
-    --shadow-neon-red: 0 0 20px hsl(0 84% 60% / 0.5);
-    --shadow-game: 0 10px 30px -10px hsl(240 10% 3.9% / 0.8);
+    /* Professional shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(210 12% 2% / 0.08);
+    --shadow-md: 0 4px 6px -1px hsl(210 12% 2% / 0.12), 0 2px 4px -1px hsl(210 12% 2% / 0.08);
+    --shadow-lg: 0 10px 15px -3px hsl(210 12% 2% / 0.15), 0 4px 6px -2px hsl(210 12% 2% / 0.08);
+    --shadow-xl: 0 20px 25px -5px hsl(210 12% 2% / 0.15), 0 10px 10px -5px hsl(210 12% 2% / 0.06);
+    
+    /* Professional typography scale */
+    --font-mono: "JetBrains Mono", "Fira Code", "Monaco", monospace;
+    --font-sans: "Inter", "system-ui", sans-serif;
     
     /* Animation properties */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   .dark {
-    /* Same as root since we're dark by default */
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 142 76% 36%;
-    --primary-foreground: 240 10% 3.9%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 5.9% 10%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 217 91% 60%;
-    --accent-foreground: 240 10% 3.9%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 142 76% 36%;
+    --background: 210 12% 7%;
+    --foreground: 210 8% 98%;
+    --card: 210 12% 9%;
+    --card-foreground: 210 8% 95%;
+    --popover: 210 12% 9%;
+    --popover-foreground: 210 8% 95%;
+    --primary: 216 87% 52%;
+    --primary-foreground: 210 12% 7%;
+    --secondary: 210 10% 12%;
+    --secondary-foreground: 210 8% 88%;
+    --muted: 210 8% 16%;
+    --muted-foreground: 210 6% 58%;
+    --accent: 142 64% 52%;
+    --accent-foreground: 210 12% 7%;
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 210 8% 98%;
+    --border: 210 8% 18%;
+    --input: 210 8% 18%;
+    --ring: 216 87% 52%;
   }
 }
 
@@ -98,8 +101,8 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+    @apply bg-background text-foreground font-sans antialiased;
+    background: radial-gradient(ellipse at top, hsl(var(--surface-2)) 0%, hsl(var(--background)) 100%);
     background-attachment: fixed;
   }
   
@@ -122,100 +125,51 @@ All colors MUST be HSL.
   }
 }
 
-/* Gaming effects and particles */
+/* Professional UI utilities */
 @layer utilities {
-  .cyber-grid {
+  .surface-1 { background-color: hsl(var(--surface-1)); }
+  .surface-2 { background-color: hsl(var(--surface-2)); }
+  .surface-3 { background-color: hsl(var(--surface-3)); }
+  
+  .glass {
+    background: hsl(var(--card) / 0.6);
+    backdrop-filter: blur(16px);
+    border: 1px solid hsl(var(--border) / 0.5);
+  }
+  
+  .trading-grid {
     background-image: 
-      linear-gradient(rgba(34, 197, 94, 0.1) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(34, 197, 94, 0.1) 1px, transparent 1px);
-    background-size: 50px 50px;
-    animation: grid-move 20s linear infinite;
+      linear-gradient(hsl(var(--border) / 0.3) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--border) / 0.3) 1px, transparent 1px);
+    background-size: 24px 24px;
   }
   
-  .neon-border {
-    border: 1px solid hsl(var(--neon-green));
-    box-shadow: 
-      0 0 10px hsl(var(--neon-green) / 0.5),
-      inset 0 0 10px hsl(var(--neon-green) / 0.1);
+  .chart-glow {
+    filter: drop-shadow(0 0 8px hsl(var(--primary) / 0.4));
   }
   
-  .retro-crt {
-    position: relative;
+  .number-mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.025em;
   }
   
-  .retro-crt::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(
-      transparent 50%,
-      rgba(0, 255, 0, 0.03) 50%
-    );
-    background-size: 100% 4px;
-    pointer-events: none;
-    animation: scanlines 0.1s linear infinite;
+  .animate-chart-draw {
+    animation: chart-draw 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
   
-  .money-rain {
-    position: fixed;
-    top: -10px;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 1000;
-  }
-  
-  .floating-emoji {
-    position: absolute;
-    font-size: 2rem;
-    opacity: 0;
-    animation: float-up 3s ease-out forwards;
-  }
-  
-  .matrix-rain {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: -1;
-    opacity: 0.1;
+  .animate-value-change {
+    animation: value-change 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-@keyframes grid-move {
-  0% { transform: translate(0, 0); }
-  100% { transform: translate(50px, 50px); }
+@keyframes chart-draw {
+  from { stroke-dashoffset: 1000; }
+  to { stroke-dashoffset: 0; }
 }
 
-@keyframes scanlines {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(4px); }
-}
-
-@keyframes float-up {
-  0% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-100px) scale(1.5);
-  }
-}
-
-@keyframes money-fall {
-  0% {
-    transform: translateY(-100vh) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(100vh) rotate(360deg);
-    opacity: 0;
-  }
+@keyframes value-change {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
