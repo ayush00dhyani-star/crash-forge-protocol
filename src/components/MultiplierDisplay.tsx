@@ -180,24 +180,6 @@ export const MultiplierDisplay = ({
         </Card>
       </div>
 
-      {/* Fun motivational messages */}
-      <Card className="p-4 bg-gradient-to-r from-purple-950/30 to-pink-950/30 backdrop-blur-sm border border-purple-500/20">
-        <div className="text-center text-sm text-purple-300">
-          {isCrashed ? (
-            "💀 RIP your bags! Better luck next time, degen! 💀"
-          ) : currentMultiplier > 10 ? (
-            "🌙 Moon mission successful! You're a legend! 🌙"
-          ) : currentMultiplier > 5 ? (
-            "🚀 Houston, we have liftoff! Diamond hands! 💎"
-          ) : currentMultiplier > 2 ? (
-            "📈 Gains are gains! But can you hold longer? 🤔"
-          ) : isActive ? (
-            "🎯 Just getting started! HODL for the moon! 🚀"
-          ) : (
-            "🎲 Ready to lose some money? Let's gooo! 🔥"
-          )}
-        </div>
-      </Card>
     </div>
   );
 };

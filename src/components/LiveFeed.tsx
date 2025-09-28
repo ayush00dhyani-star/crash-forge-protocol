@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { TrendingUp, DollarSign, AlertTriangle, Activity } from "lucide-react";
 
 interface FeedEvent {
   id: string;
@@ -28,26 +29,27 @@ export const LiveFeed = ({ events }: LiveFeedProps) => {
   };
 
   const getEventIcon = (type: string) => {
+    const common = 'h-4 w-4';
     switch (type) {
       case "bet":
-        return "🎯";
+        return <TrendingUp className={`${common} text-accent`} />;
       case "cashout":
-        return "💰";
+        return <DollarSign className={`${common} text-primary`} />;
       case "crash":
-        return "💥";
+        return <AlertTriangle className={`${common} text-destructive`} />;
       default:
-        return "📊";
+        return <Activity className={`${common} text-muted-foreground`} />;
     }
   };
 
   const getEventColor = (type: string) => {
     switch (type) {
       case "bet":
-        return "bg-neon-blue/20 text-neon-blue border-neon-blue/30 shadow-neon-blue/20";
+        return "bg-accent/10 text-accent border-accent/20";
       case "cashout":
-        return "bg-neon-green/20 text-neon-green border-neon-green/30 shadow-neon-green/20";
+        return "bg-primary/10 text-primary border-primary/20";
       case "crash":
-        return "bg-neon-red/20 text-neon-red border-neon-red/30 shadow-neon-red/20";
+        return "bg-destructive/10 text-destructive border-destructive/20";
       default:
         return "bg-secondary text-foreground border-border";
     }
@@ -56,11 +58,11 @@ export const LiveFeed = ({ events }: LiveFeedProps) => {
   const getEventText = (event: FeedEvent) => {
     switch (event.type) {
       case "bet":
-        return `🎲 YOLO'd ${event.amount.toFixed(3)} SOL`;
+        return `Bet ${event.amount.toFixed(3)} SOL`;
       case "cashout":
-        return `💎 Cashed out at ${event.multiplier?.toFixed(2)}x for ${(event.amount * (event.multiplier || 1)).toFixed(3)} SOL`;
+        return `Cashed out at ${event.multiplier?.toFixed(2)}x · ${(event.amount * (event.multiplier || 1)).toFixed(3)} SOL`;
       case "crash":
-        return `🔥 Market crashed at ${event.multiplier?.toFixed(2)}x - RIP degens`;
+        return `Crashed at ${event.multiplier?.toFixed(2)}x`;
       default:
         return "";
     }
@@ -85,12 +87,8 @@ export const LiveFeed = ({ events }: LiveFeedProps) => {
     <Card className="h-96 bg-gradient-to-br from-gray-900/80 to-gray-800/50 backdrop-blur-lg border-neon-purple/30 neon-border">
       <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-black text-transparent bg-gradient-neon bg-clip-text">
-            🔥 LIVE FEED 🔥
-          </h3>
-          <Badge variant="outline" className="bg-red-500/20 text-red-400 border-red-500/30 animate-pulse">
-            🔴 LIVE
-          </Badge>
+          <h3 className="text-lg font-bold text-foreground">Live Feed</h3>
+          <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/30">● Live</Badge>
         </div>
       </div>
       
@@ -106,7 +104,7 @@ export const LiveFeed = ({ events }: LiveFeedProps) => {
             events.map((event) => (
               <div
                 key={event.id}
-                className={`p-4 rounded-xl border transition-all duration-300 hover:scale-105 ${getEventColor(event.type)} group`}
+                className={`p-4 rounded-xl border transition-colors duration-300 hover:bg-muted/40 ${getEventColor(event.type)} group`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -125,7 +123,6 @@ export const LiveFeed = ({ events }: LiveFeedProps) => {
                         <span className="font-mono text-sm font-bold truncate">
                           {formatPlayer(event.player)}
                         </span>
-                        <span className="text-lg">{getEventEmoji(event)}</span>
                       </div>
                       <div className="text-sm opacity-90 group-hover:opacity-100 transition-opacity">
                         {getEventText(event)}
@@ -148,10 +145,6 @@ export const LiveFeed = ({ events }: LiveFeedProps) => {
                   </div>
                 </div>
                 
-                {/* Animated background for special events */}
-                {event.type === "cashout" && event.multiplier && event.multiplier > 10 && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 via-green-500/10 to-yellow-500/10 animate-pulse pointer-events-none rounded-xl"></div>
-                )}
               </div>
             ))
           )}

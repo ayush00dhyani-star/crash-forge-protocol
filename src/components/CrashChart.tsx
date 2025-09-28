@@ -97,7 +97,7 @@ export const CrashChart = ({
     const chartHeight = rect.height - (padding * 2);
 
     // Professional grid system
-    ctx.strokeStyle = 'rgba(34, 197, 94, 0.08)';
+    ctx.strokeStyle = `hsl(${getComputedStyle(document.documentElement).getPropertyValue('--muted-foreground').trim()} / 0.12)`;
     ctx.lineWidth = 1;
     
     // Dynamic horizontal grid lines
@@ -110,10 +110,10 @@ export const CrashChart = ({
       ctx.stroke();
       
       // Professional labels
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-      ctx.font = '12px "JetBrains Mono", monospace';
-      ctx.textAlign = 'right';
-      ctx.fillText(`${m.toFixed(1)}x`, padding - 10, y + 4);
+      ctx.fillStyle = `hsl(${getComputedStyle(document.documentElement).getPropertyValue('--muted-foreground').trim()} / 0.7)`;
+       ctx.font = '12px "JetBrains Mono", monospace';
+       ctx.textAlign = 'right';
+       ctx.fillText(`${m.toFixed(1)}x`, padding - 10, y + 4);
     }
 
     // Dynamic vertical grid lines
@@ -126,10 +126,10 @@ export const CrashChart = ({
       ctx.stroke();
       
       // Time labels
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-      ctx.font = '10px "JetBrains Mono", monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText(`${(t/1000).toFixed(0)}s`, x, padding + chartHeight + 20);
+      ctx.fillStyle = `hsl(${getComputedStyle(document.documentElement).getPropertyValue('--muted-foreground').trim()} / 0.5)`;
+       ctx.font = '10px "JetBrains Mono", monospace';
+       ctx.textAlign = 'center';
+       ctx.fillText(`${(t/1000).toFixed(0)}s`, x, padding + chartHeight + 20);
     }
 
     // Ultra-smooth curve rendering with advanced effects
@@ -276,14 +276,14 @@ export const CrashChart = ({
     return "WAITING";
   };
 
-  const getStatusColor = () => {
-    if (isCrashed) return "bg-red-500/30 text-red-400 border-red-500/50 animate-crash-pulse";
-    if (isActive) return "bg-green-500/30 text-green-400 border-green-500/50 animate-pulse-neon";
-    return "bg-yellow-500/30 text-yellow-400 border-yellow-500/50 animate-pulse";
-  };
+   const getStatusColor = () => {
+     if (isCrashed) return "bg-destructive/15 text-destructive border-destructive/40";
+     if (isActive) return "bg-primary/15 text-primary border-primary/40";
+     return "bg-accent/15 text-accent border-accent/40";
+   };
 
   return (
-    <Card className="relative h-[500px] p-6 bg-gradient-to-br from-black/60 via-gray-900/40 to-black/80 backdrop-blur-xl border-2 border-neon-green/20 cyber-grid overflow-hidden">
+    <Card className="relative h-[500px] p-6 bg-card/80 backdrop-blur-xl border border-border shadow-game overflow-hidden">
       {/* Professional status indicator */}
       <div className="absolute top-6 left-6 z-20">
         <Badge variant="outline" className={`${getStatusColor()} font-mono text-sm px-4 py-2`}>
@@ -298,27 +298,27 @@ export const CrashChart = ({
 
       {/* Live multiplier display */}
       <div className="absolute top-6 right-6 z-20">
-        <div className={`text-4xl font-black font-mono ${
-          isCrashed ? 'text-red-400 animate-crash-pulse' : 
-          isActive ? 'text-green-400 animate-glow' : 'text-yellow-400'
-        } drop-shadow-lg`}>
-          {currentMultiplier.toFixed(2)}x
-        </div>
-        {isActive && (
-          <div className="text-sm text-center text-green-300 animate-pulse mt-1">
-            {((Date.now() - (startTime || Date.now())) / 1000).toFixed(1)}s
-          </div>
-        )}
+         <div className={`text-4xl font-black font-mono ${
+           isCrashed ? 'text-destructive' : 
+           isActive ? 'text-primary' : 'text-accent'
+         }`}>
+           {currentMultiplier.toFixed(2)}x
+         </div>
+         {isActive && (
+           <div className="text-sm text-center text-muted-foreground mt-1">
+             {((Date.now() - (startTime || Date.now())) / 1000).toFixed(1)}s
+           </div>
+         )}
       </div>
 
       {/* High-performance canvas */}
       <canvas 
         ref={canvasRef}
         className="absolute inset-6 w-[calc(100%-3rem)] h-[calc(100%-3rem)] rounded-lg"
-        style={{ 
-          background: 'radial-gradient(circle at 30% 70%, rgba(34, 197, 94, 0.05) 0%, transparent 60%)',
-          filter: isActive ? 'contrast(1.1) brightness(1.05)' : 'contrast(0.9) brightness(0.8)'
-        }}
+         style={{ 
+           background: 'radial-gradient(circle at 30% 70%, hsl(var(--primary) / 0.06) 0%, transparent 60%)',
+           filter: isActive ? 'contrast(1.05) brightness(1.02)' : 'contrast(0.95) brightness(0.95)'
+         }}
       />
 
       {/* Waiting state with better UX */}
