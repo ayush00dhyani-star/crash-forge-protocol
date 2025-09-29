@@ -47,24 +47,39 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Cyberpunk neon colors
+        neon: {
+          cyan: "hsl(var(--neon-cyan))",
+          magenta: "hsl(var(--neon-magenta))",
+          purple: "hsl(var(--neon-purple))",
+          green: "hsl(var(--neon-green))",
+          red: "hsl(var(--neon-red))",
+          yellow: "hsl(var(--neon-yellow))",
+        },
+        // Status colors
         success: "hsl(var(--success))",
         warning: "hsl(var(--warning))",
-        info: "hsl(var(--info))",
+        // Surface levels
         surface: {
           1: "hsl(var(--surface-1))",
           2: "hsl(var(--surface-2))",
           3: "hsl(var(--surface-3))",
+          elevated: "hsl(var(--surface-elevated))",
         },
+        glass: "hsl(var(--glass))",
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        display: ["Orbitron", "Space Grotesk", "monospace"],
+        body: ["Space Grotesk", "Inter", "sans-serif"],
+        sans: ["Space Grotesk", "Inter", "system-ui", "sans-serif"],
         mono: ["JetBrains Mono", "Fira Code", "Monaco", "monospace"],
       },
       backgroundImage: {
-        "gradient-primary": "var(--gradient-primary)",
-        "gradient-success": "var(--gradient-success)",
-        "gradient-surface": "var(--gradient-surface)",
-        "gradient-chart": "var(--gradient-chart)",
+        "gradient-neon-primary": "var(--gradient-neon-primary)",
+        "gradient-neon-danger": "var(--gradient-neon-danger)",
+        "gradient-neon-success": "var(--gradient-neon-success)",
+        "gradient-glass": "var(--gradient-glass)",
+        "gradient-chart-fill": "var(--gradient-chart-fill)",
       },
       boxShadow: {
         sm: "var(--shadow-sm)",

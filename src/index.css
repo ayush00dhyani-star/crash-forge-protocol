@@ -2,96 +2,89 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Cyberpunk Meme Market Crash Theme - Dark neon aesthetic with glass morphism */
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    /* Professional dark trading theme */
-    --background: 210 12% 7%;
-    --foreground: 210 8% 98%;
+    /* Cyberpunk Dark Base */
+    --background: 220 25% 5%;
+    --foreground: 180 100% 95%;
 
-    --card: 210 12% 9%;
-    --card-foreground: 210 8% 95%;
+    /* Glass morphism surfaces */
+    --card: 220 20% 8%;
+    --card-foreground: 180 100% 92%;
+    --glass: 220 15% 10%;
 
-    --popover: 210 12% 9%;
-    --popover-foreground: 210 8% 95%;
+    /* Neon accent colors */
+    --neon-cyan: 180 100% 50%;     /* Electric blue #00ffff */
+    --neon-magenta: 300 100% 50%;  /* Vibrant pink #ff00ff */
+    --neon-purple: 271 76% 53%;    /* Purple #8a2be2 */
+    --neon-green: 120 100% 50%;    /* Success green */
+    --neon-red: 0 100% 50%;        /* Danger red */
+    --neon-yellow: 60 100% 50%;    /* Warning yellow */
 
-    /* Sophisticated blue accent */
-    --primary: 216 87% 52%;
-    --primary-foreground: 210 12% 7%;
-
-    /* Elevated dark surfaces */
-    --secondary: 210 10% 12%;
-    --secondary-foreground: 210 8% 88%;
-
-    --muted: 210 8% 16%;
-    --muted-foreground: 210 6% 58%;
-
-    /* Professional success green */
-    --accent: 142 64% 52%;
-    --accent-foreground: 210 12% 7%;
-
-    /* Warning/danger red */
-    --destructive: 0 75% 55%;
-    --destructive-foreground: 210 8% 98%;
-
-    --border: 210 8% 18%;
-    --input: 210 8% 18%;
-    --ring: 216 87% 52%;
-
-    --radius: 8px;
-
-    /* Professional trading colors */
-    --success: 142 64% 52%;
-    --warning: 45 93% 60%;
-    --info: 216 87% 52%;
-    --surface-1: 210 12% 9%;
-    --surface-2: 210 10% 12%;
-    --surface-3: 210 8% 16%;
+    /* Primary theme colors */
+    --primary: var(--neon-cyan);
+    --primary-foreground: 220 25% 5%;
+    --secondary: var(--neon-purple);
+    --secondary-foreground: 180 100% 95%;
     
-    /* Sophisticated gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(216 87% 52%), hsl(226 87% 58%));
-    --gradient-success: linear-gradient(135deg, hsl(142 64% 52%), hsl(152 64% 58%));
-    --gradient-surface: linear-gradient(135deg, hsl(210 12% 9%), hsl(210 10% 12%));
-    --gradient-chart: linear-gradient(180deg, hsl(216 87% 52% / 0.15), transparent);
-    
-    /* Professional shadows */
-    --shadow-sm: 0 1px 2px 0 hsl(210 12% 2% / 0.08);
-    --shadow-md: 0 4px 6px -1px hsl(210 12% 2% / 0.12), 0 2px 4px -1px hsl(210 12% 2% / 0.08);
-    --shadow-lg: 0 10px 15px -3px hsl(210 12% 2% / 0.15), 0 4px 6px -2px hsl(210 12% 2% / 0.08);
-    --shadow-xl: 0 20px 25px -5px hsl(210 12% 2% / 0.15), 0 10px 10px -5px hsl(210 12% 2% / 0.06);
-    
-    /* Professional typography scale */
-    --font-mono: "JetBrains Mono", "Fira Code", "Monaco", monospace;
-    --font-sans: "Inter", "system-ui", sans-serif;
-    
-    /* Animation properties */
-    --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-spring: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* Status colors */
+    --success: var(--neon-green);
+    --destructive: var(--neon-red);
+    --warning: var(--neon-yellow);
+    --accent: var(--neon-magenta);
+    --accent-foreground: 220 25% 5%;
+
+    /* Muted colors */
+    --muted: 220 15% 15%;
+    --muted-foreground: 180 50% 70%;
+    --border: 220 15% 20%;
+    --input: 220 15% 12%;
+    --ring: var(--neon-cyan);
+
+    /* Surface levels */
+    --surface-1: 220 20% 8%;
+    --surface-2: 220 15% 12%;
+    --surface-3: 220 10% 16%;
+    --surface-elevated: 220 25% 10%;
+
+    /* Neon gradients */
+    --gradient-neon-primary: linear-gradient(135deg, hsl(var(--neon-cyan)), hsl(var(--neon-purple)));
+    --gradient-neon-danger: linear-gradient(135deg, hsl(var(--neon-red)), hsl(var(--neon-magenta)));
+    --gradient-neon-success: linear-gradient(135deg, hsl(var(--neon-green)), hsl(var(--neon-cyan)));
+    --gradient-glass: linear-gradient(135deg, hsl(var(--glass) / 0.8), hsl(var(--glass) / 0.4));
+    --gradient-chart-fill: linear-gradient(180deg, hsl(var(--neon-cyan) / 0.3), transparent);
+
+    /* Glow effects */
+    --glow-cyan: 0 0 20px hsl(var(--neon-cyan) / 0.5);
+    --glow-magenta: 0 0 20px hsl(var(--neon-magenta) / 0.5);
+    --glow-purple: 0 0 20px hsl(var(--neon-purple) / 0.5);
+    --glow-green: 0 0 20px hsl(var(--neon-green) / 0.5);
+    --glow-red: 0 0 20px hsl(var(--neon-red) / 0.5);
+
+    /* Cyberpunk shadows */
+    --shadow-neon: 0 0 30px hsl(var(--neon-cyan) / 0.3);
+    --shadow-glass: 0 8px 32px hsl(220 25% 2% / 0.3);
+    --shadow-elevated: 0 16px 48px hsl(220 25% 2% / 0.4);
+
+    /* Typography */
+    --font-display: "Orbitron", "Space Grotesk", monospace;
+    --font-body: "Space Grotesk", "Inter", sans-serif;
+    --font-mono: "JetBrains Mono", "Fira Code", monospace;
+
+    --radius: 12px;
+
+    /* Animations */
+    --transition-cyber: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-glow: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    --transition-bounce: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 
   .dark {
-    --background: 210 12% 7%;
-    --foreground: 210 8% 98%;
-    --card: 210 12% 9%;
-    --card-foreground: 210 8% 95%;
-    --popover: 210 12% 9%;
-    --popover-foreground: 210 8% 95%;
-    --primary: 216 87% 52%;
-    --primary-foreground: 210 12% 7%;
-    --secondary: 210 10% 12%;
-    --secondary-foreground: 210 8% 88%;
-    --muted: 210 8% 16%;
-    --muted-foreground: 210 6% 58%;
-    --accent: 142 64% 52%;
-    --accent-foreground: 210 12% 7%;
-    --destructive: 0 75% 55%;
-    --destructive-foreground: 210 8% 98%;
-    --border: 210 8% 18%;
-    --input: 210 8% 18%;
-    --ring: 216 87% 52%;
+    /* Inherits cyberpunk theme variables */
   }
 }
 
@@ -101,8 +94,13 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
-    background: radial-gradient(ellipse at top, hsl(var(--surface-2)) 0%, hsl(var(--background)) 100%);
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-body);
+    background: 
+      radial-gradient(ellipse at 20% 80%, hsl(var(--neon-purple) / 0.1) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, hsl(var(--neon-cyan) / 0.1) 0%, transparent 50%),
+      radial-gradient(ellipse at 40% 40%, hsl(var(--neon-magenta) / 0.05) 0%, transparent 50%),
+      hsl(var(--background));
     background-attachment: fixed;
   }
   
@@ -125,28 +123,45 @@ All colors MUST be HSL.
   }
 }
 
-/* Professional UI utilities */
+/* Cyberpunk UI utilities and animations */
 @layer utilities {
+  /* Surface utilities */
   .surface-1 { background-color: hsl(var(--surface-1)); }
   .surface-2 { background-color: hsl(var(--surface-2)); }
   .surface-3 { background-color: hsl(var(--surface-3)); }
+  .surface-elevated { background-color: hsl(var(--surface-elevated)); }
   
+  /* Glass morphism effects */
   .glass {
-    background: hsl(var(--card) / 0.6);
-    backdrop-filter: blur(16px);
-    border: 1px solid hsl(var(--border) / 0.5);
+    background: var(--gradient-glass);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid hsl(var(--border) / 0.3);
+    box-shadow: var(--shadow-glass);
   }
   
-  .trading-grid {
-    background-image: 
-      linear-gradient(hsl(var(--border) / 0.3) 1px, transparent 1px),
-      linear-gradient(90deg, hsl(var(--border) / 0.3) 1px, transparent 1px);
-    background-size: 24px 24px;
+  .glass-elevated {
+    background: hsl(var(--surface-elevated) / 0.8);
+    backdrop-filter: blur(24px) saturate(200%);
+    border: 1px solid hsl(var(--border) / 0.4);
+    box-shadow: var(--shadow-elevated);
   }
   
-  .chart-glow {
-    filter: drop-shadow(0 0 8px hsl(var(--primary) / 0.4));
-  }
+  /* Neon effects */
+  .neon-glow-cyan { box-shadow: var(--glow-cyan); }
+  .neon-glow-magenta { box-shadow: var(--glow-magenta); }
+  .neon-glow-purple { box-shadow: var(--glow-purple); }
+  .neon-glow-green { box-shadow: var(--glow-green); }
+  .neon-glow-red { box-shadow: var(--glow-red); }
+  
+  /* Gradients */
+  .gradient-neon-primary { background: var(--gradient-neon-primary); }
+  .gradient-neon-danger { background: var(--gradient-neon-danger); }
+  .gradient-neon-success { background: var(--gradient-neon-success); }
+  
+  /* Typography utilities */
+  .font-display { font-family: var(--font-display); }
+  .font-body { font-family: var(--font-body); }
+  .font-mono { font-family: var(--font-mono); }
   
   .number-mono {
     font-family: var(--font-mono);
@@ -154,22 +169,113 @@ All colors MUST be HSL.
     letter-spacing: -0.025em;
   }
   
-  .animate-chart-draw {
-    animation: chart-draw 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  /* Chart utilities */
+  .chart-container {
+    background: hsl(var(--surface-1) / 0.5);
+    border: 1px solid hsl(var(--border) / 0.3);
+    backdrop-filter: blur(16px);
   }
   
-  .animate-value-change {
-    animation: value-change 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  .chart-grid {
+    background-image: 
+      linear-gradient(hsl(var(--neon-cyan) / 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--neon-cyan) / 0.1) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  
+  /* Animation utilities */
+  .animate-glow-pulse { animation: glow-pulse 2s ease-in-out infinite; }
+  .animate-neon-flicker { animation: neon-flicker 0.1s linear infinite; }
+  .animate-screen-shake { animation: screen-shake 0.5s ease-in-out; }
+  .animate-float { animation: float 3s ease-in-out infinite; }
+  .animate-particle { animation: particle-float 2s ease-out forwards; }
+  .animate-crash-explosion { animation: crash-explosion 0.8s ease-out forwards; }
+  .animate-chart-draw { animation: chart-draw 2s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+  .animate-value-pump { animation: value-pump 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+  .animate-hype-meter { animation: hype-meter 1s ease-out forwards; }
+}
+
+/* Cyberpunk keyframes */
+@keyframes glow-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 20px hsl(var(--neon-cyan) / 0.3);
+    filter: brightness(1);
+  }
+  50% { 
+    box-shadow: 0 0 40px hsl(var(--neon-cyan) / 0.6);
+    filter: brightness(1.2);
+  }
+}
+
+@keyframes neon-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes screen-shake {
+  0%, 100% { transform: translate(0); }
+  10% { transform: translate(-2px, -1px); }
+  20% { transform: translate(2px, 1px); }
+  30% { transform: translate(-1px, 2px); }
+  40% { transform: translate(1px, -2px); }
+  50% { transform: translate(-2px, 1px); }
+  60% { transform: translate(2px, -1px); }
+  70% { transform: translate(-1px, -2px); }
+  80% { transform: translate(1px, 2px); }
+  90% { transform: translate(-2px, -1px); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes particle-float {
+  0% { 
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% { 
+    opacity: 0;
+    transform: translateY(-100px) scale(0.3);
+  }
+}
+
+@keyframes crash-explosion {
+  0% { 
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% { 
+    transform: scale(2);
+    opacity: 0.8;
+  }
+  100% { 
+    transform: scale(3);
+    opacity: 0;
   }
 }
 
 @keyframes chart-draw {
-  from { stroke-dashoffset: 1000; }
-  to { stroke-dashoffset: 0; }
+  from { 
+    stroke-dashoffset: 2000;
+    opacity: 0;
+  }
+  to { 
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
 }
 
-@keyframes value-change {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+@keyframes value-pump {
+  0% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.1) rotate(1deg); }
+  50% { transform: scale(1.2) rotate(0deg); }
+  75% { transform: scale(1.1) rotate(-1deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+@keyframes hype-meter {
+  0% { width: 0%; }
+  100% { width: var(--hype-level, 50%); }
 }

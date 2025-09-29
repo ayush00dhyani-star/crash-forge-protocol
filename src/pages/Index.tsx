@@ -1,12 +1,11 @@
 import { useGameEngine } from "@/hooks/useGameEngine";
-import { TradingChart } from "@/components/TradingChart";
-import { MultiplierPanel } from "@/components/MultiplierPanel";
-import { ActivityFeed } from "@/components/ActivityFeed";
-import { BetPanel } from "@/components/BetPanel";
+import { CyberChart } from "@/components/CyberChart";
+import { CyberBetPanel } from "@/components/CyberBetPanel";
+import { HypeChat } from "@/components/HypeChat";
 import { GameStats } from "@/components/GameStats";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, Users, BarChart3 } from "lucide-react";
+import { Zap, Users, BarChart3, Skull } from "lucide-react";
 
 const Index = () => {
   const {
@@ -34,104 +33,64 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-lg sticky top-0 z-50">
+      {/* Cyberpunk Header */}
+      <header className="border-b border-border/30 glass-elevated sticky top-0 z-50">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <TrendingUp className="h-8 w-8 text-primary" />
+            <div className="flex items-center gap-4">
+              <Zap className="h-10 w-10 text-neon-cyan animate-glow-pulse" />
               <div>
-                <h1 className="text-2xl font-bold">Crash Trading</h1>
-                <p className="text-sm text-muted-foreground">Professional multiplier platform</p>
+                <h1 className="text-3xl font-display font-black text-neon-cyan">
+                  MEME MARKET CRASH
+                </h1>
+                <p className="text-sm text-neon-purple font-mono">
+                  Where memes go to die or moon 🚀
+                </p>
               </div>
             </div>
             
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-4">
-                <div className="text-right">
-                  <div className="text-xs text-muted-foreground uppercase tracking-wide">Round</div>
-                  <div className="text-lg font-bold number-mono">#{roundId}</div>
+                <div className="text-center p-2 bg-surface-2 rounded-lg">
+                  <div className="text-xs text-muted-foreground uppercase tracking-wide font-mono">ROUND</div>
+                  <div className="text-xl font-display font-bold text-neon-cyan">#{roundId}</div>
                 </div>
-                <div className="text-right">
-                  <div className="text-xs text-muted-foreground uppercase tracking-wide">Players</div>
-                  <div className="text-lg font-bold number-mono">{gameStats.totalPlayers.toLocaleString()}</div>
+                <div className="text-center p-2 bg-surface-2 rounded-lg">
+                  <div className="text-xs text-muted-foreground uppercase tracking-wide font-mono">DEGENS</div>
+                  <div className="text-xl font-display font-bold text-neon-magenta">{gameStats.totalPlayers.toLocaleString()}</div>
                 </div>
               </div>
               
               <Badge 
                 variant={isWalletConnected ? "default" : "secondary"}
-                className="px-4 py-2 cursor-pointer"
+                className={`px-6 py-3 cursor-pointer font-mono font-bold ${
+                  isWalletConnected ? 'gradient-neon-success neon-glow-green' : 'border-neon-cyan text-neon-cyan hover:bg-neon-cyan hover:text-black'
+                }`}
                 onClick={toggleWallet}
               >
-                {isWalletConnected ? "Connected" : "Connect Wallet"}
+                {isWalletConnected ? "🔗 CONNECTED" : "🔌 CONNECT"}
               </Badge>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
+      {/* Main Cyberpunk Interface */}
       <main className="container mx-auto px-6 py-8">
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
           {/* Chart Section */}
           <div className="xl:col-span-3 space-y-6">
-            <TradingChart
+            <CyberChart
               currentMultiplier={currentMultiplier}
               isActive={isRoundActive}
               isCrashed={isCrashed}
               crashPoint={crashPoint}
             />
-            
-            {/* Stats Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="p-4 glass">
-                <div className="flex items-center gap-3">
-                  <BarChart3 className="h-8 w-8 text-primary" />
-                  <div>
-                    <div className="text-sm text-muted-foreground">Total Volume</div>
-                    <div className="text-xl font-bold number-mono">
-                      {gameStats.totalBets.toLocaleString()} SOL
-                    </div>
-                  </div>
-                </div>
-              </Card>
-              
-              <Card className="p-4 glass">
-                <div className="flex items-center gap-3">
-                  <TrendingUp className="h-8 w-8 text-success" />
-                  <div>
-                    <div className="text-sm text-muted-foreground">Biggest Win</div>
-                    <div className="text-xl font-bold number-mono">
-                      {gameStats.biggestWin.toLocaleString()} SOL
-                    </div>
-                  </div>
-                </div>
-              </Card>
-              
-              <Card className="p-4 glass">
-                <div className="flex items-center gap-3">
-                  <Users className="h-8 w-8 text-info" />
-                  <div>
-                    <div className="text-sm text-muted-foreground">Active Players</div>
-                    <div className="text-xl font-bold number-mono">
-                      {gameStats.totalPlayers.toLocaleString()}
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </div>
           </div>
 
-          {/* Sidebar */}
+          {/* Cyberpunk Sidebar */}
           <div className="space-y-6">
-            <MultiplierPanel
-              currentMultiplier={currentMultiplier}
-              isActive={isRoundActive}
-              isCrashed={isCrashed}
-              timeRemaining={timeRemaining}
-            />
-            
-            <BetPanel
+            <CyberBetPanel
               balance={balance}
               currentBet={currentBet}
               isRoundActive={isRoundActive}
@@ -148,7 +107,11 @@ const Index = () => {
 
         {/* Bottom Section */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-8">
-          <ActivityFeed events={feedEvents} />
+          <HypeChat 
+            isActive={isRoundActive}
+            currentMultiplier={currentMultiplier}
+            isCrashed={isCrashed}
+          />
           <GameStats 
             gameStats={gameStats} 
             roundHistory={roundHistory}
