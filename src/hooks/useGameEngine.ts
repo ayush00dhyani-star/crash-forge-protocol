@@ -59,53 +59,56 @@ export const useGameEngine = () => {
   const gamePhaseRef = useRef<'waiting' | 'countdown' | 'active' | 'crashed'>('waiting');
   const growthRateRef = useRef<number>(1.0022);
 
-  // Advanced crash algorithm with cryptographically secure randomness
+  // Advanced crash algorithm with realistic distribution
   const calculateCrashPoint = useCallback((roundId: number): number => {
-    const houseEdge = 0.01; // 1%
-    const minMultiplier = 1.01;
-    const maxMultiplier = 1000000;
+    // Use multiple entropy sources
+    const seed1 = Math.sin(roundId * 12.9898) * 43758.5453;
+    const seed2 = Math.sin(roundId * 78.233) * 37659.3734;
+    const seed3 = Math.sin(roundId * 15.731) * 29487.2847;
     
-    // Use multiple entropy sources for cryptographic security
-    const serverSeed = roundId.toString();
-    const clientSeed = Date.now().toString();
-    const nonce = roundId;
+    // Combine and normalize
+    const combined = Math.abs((seed1 + seed2 + seed3) % 1);
     
-    // Create hash using built-in crypto (simplified for browser)
-    const hashInput = serverSeed + clientSeed + nonce;
-    let hash = 0;
-    for (let i = 0; i < hashInput.length; i++) {
-      const char = hashInput.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32bit integer
+    // Industry-standard distribution
+    if (combined < 0.33) {
+      // 33% chance for 1.01x - 2.5x
+      return 1.01 + (combined / 0.33) * 1.49;
+    } else if (combined < 0.66) {
+      // 33% chance for 2.5x - 10x
+      return 2.5 + ((combined - 0.33) / 0.33) * 7.5;
+    } else if (combined < 0.90) {
+      // 24% chance for 10x - 50x
+      return 10 + ((combined - 0.66) / 0.24) * 40;
+    } else {
+      // 10% chance for 50x - 1000x (moon shots)
+      return 50 + ((combined - 0.90) / 0.10) * 950;
     }
-    
-    // Convert to positive number and normalize to [0, 2^52)
-    const h = Math.abs(hash) % (2 ** 32); // Use 32-bit for browser compatibility
-    
-    if (h === 0) return minMultiplier; // Instant crash (rare)
-    
-    // Industry-standard crash formula
-    const crashPoint = Math.floor((2 ** 32) / h) / 10000 * (1 - houseEdge);
-    
-    return Math.max(minMultiplier, Math.min(crashPoint, maxMultiplier));
   }, []);
 
-  // Realistic round duration based on crash point
+  // Dynamic round duration based on crash point
   const getRoundDuration = useCallback((crashPoint: number): number => {
-    const baseTime = 3000; // 3 seconds minimum
-    const additionalTime = Math.log(crashPoint) * 2000; // Logarithmic scaling
-    return baseTime + Math.min(additionalTime, 30000); // Max 33 seconds total
+    if (crashPoint < 2) return 2000 + Math.random() * 1000; // 2-3 seconds
+    if (crashPoint < 5) return 4000 + Math.random() * 2000; // 4-6 seconds
+    if (crashPoint < 20) return 8000 + Math.random() * 4000; // 8-12 seconds
+    return 15000 + Math.random() * 10000; // 15-25 seconds for moon shots
   }, []);
 
-  // Professional multiplier animation with smooth curves
+  // Smooth multiplier animation with exponential growth
   const updateMultiplier = useCallback(() => {
     if (gamePhaseRef.current !== 'active' || isCrashed) return;
 
     const elapsed = Date.now() - roundStartTimeRef.current;
     const targetDuration = getRoundDuration(crashPointRef.current);
-    const progress = elapsed / targetDuration;
+    const progress = Math.min(elapsed / targetDuration, 1);
     
-    if (progress >= 1) {
+    // Exponential curve that reaches crash point at target duration
+    const exponent = Math.log(crashPointRef.current) / Math.log(Math.E);
+    const currentMultiplier = 1 + (crashPointRef.current - 1) * Math.pow(progress, 0.5);
+    
+    setCurrentMultiplier(parseFloat(currentMultiplier.toFixed(2)));
+    
+    // Check if we've reached the crash point
+    if (progress >= 1 || currentMultiplier >= crashPointRef.current) {
       // Crash moment
       gamePhaseRef.current = 'crashed';
       setIsCrashed(true);
@@ -145,22 +148,16 @@ export const useGameEngine = () => {
       return;
     }
 
-    // Smooth exponential curve animation
-    const easedProgress = 1 - Math.pow(1 - progress, 3); // Cubic ease-out
-    const newMultiplier = 1 + (crashPointRef.current - 1) * easedProgress;
-    
-    setCurrentMultiplier(parseFloat(newMultiplier.toFixed(2)));
-
     // Auto cashout handling
-    if (autoCashOut && newMultiplier >= autoCashOut && currentBet && !cashOutRequested) {
+    if (autoCashOut && currentMultiplier >= autoCashOut && currentBet && !cashOutRequested) {
       handleCashOut();
     }
   }, [isCrashed, currentBet, cashOutRequested, autoCashOut, roundId, toast, getRoundDuration]);
 
-  // High-frequency updates for smooth 60fps animation
+  // 60fps smooth animation
   useEffect(() => {
     if (gamePhaseRef.current === 'active' && !isCrashed) {
-      multiplierIntervalRef.current = setInterval(updateMultiplier, 16); // 60fps for smooth performance
+      multiplierIntervalRef.current = setInterval(updateMultiplier, 50); // 20fps for smooth performance
       return () => {
         if (multiplierIntervalRef.current) {
           clearInterval(multiplierIntervalRef.current);
@@ -191,13 +188,13 @@ export const useGameEngine = () => {
   }, [timeRemaining]);
 
   const startRound = useCallback(() => {
-    const newCrashPoint = calculateCrashPoint(roundId);
+    const newCrashPoint = parseFloat(calculateCrashPoint(roundId).toFixed(2));
     crashPointRef.current = newCrashPoint;
     gamePhaseRef.current = 'active';
     
-    console.log(`🚀 Round #${roundId} - Target: ${newCrashPoint.toFixed(2)}x`);
+    console.log(`🚀 Round #${roundId} - Target: ${newCrashPoint}x`);
     
-     setIsRoundActive(true);
+    setIsRoundActive(true);
     setIsCrashed(false);
     setCurrentMultiplier(1.00);
     setCashOutRequested(false);

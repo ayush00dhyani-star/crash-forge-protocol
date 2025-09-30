@@ -81,33 +81,37 @@ export const CyberChart = ({
     }
   }, [isCrashed]);
 
-  // Data collection
+  // Optimized data collection with performance throttling
   useEffect(() => {
     if (isActive && !isCrashed && startTime > 0) {
       const currentTime = Date.now() - startTime;
       
       setChartData(prev => {
         const newPoint = { time: currentTime, multiplier: currentMultiplier };
-        const newData = [...prev, newPoint];
         
-        // Add trailing particles
-        if (prev.length > 0) {
-          const canvas = canvasRef.current;
-          if (canvas) {
-            const rect = canvas.getBoundingClientRect();
-            const padding = 40;
-            const chartWidth = rect.width - (padding * 2);
-            const chartHeight = rect.height - (padding * 2);
-            const maxTime = Math.max(...newData.map(p => p.time));
-            const maxMultiplier = Math.max(2.0, Math.max(...newData.map(p => p.multiplier)) * 1.1);
-            const minMultiplier = 1.0;
-            
-            const x = padding + (currentTime / Math.max(1, maxTime)) * chartWidth;
-            const y = padding + chartHeight - ((currentMultiplier - minMultiplier) / Math.max(0.001, (maxMultiplier - minMultiplier))) * chartHeight;
-            
-            // Add particle trail
-            if (Math.random() < 0.3) {
-              setParticles(prev => [...prev, {
+        // Only add point if multiplier changed significantly or time interval passed
+        if (prev.length === 0 || 
+            Math.abs(currentMultiplier - prev[prev.length - 1].multiplier) > 0.01 ||
+            currentTime - prev[prev.length - 1].time > 100) {
+          
+          const newData = [...prev, newPoint];
+          
+          // Add optimized particle trail
+          if (Math.random() < 0.2) {
+            const canvas = canvasRef.current;
+            if (canvas) {
+              const rect = canvas.getBoundingClientRect();
+              const padding = 40;
+              const chartWidth = rect.width - (padding * 2);
+              const chartHeight = rect.height - (padding * 2);
+              const maxTime = Math.max(1, currentTime);
+              const maxMultiplier = Math.max(2.0, currentMultiplier * 1.1);
+              const minMultiplier = 1.0;
+              
+              const x = padding + (currentTime / maxTime) * chartWidth;
+              const y = padding + chartHeight - ((currentMultiplier - minMultiplier) / Math.max(0.001, (maxMultiplier - minMultiplier))) * chartHeight;
+              
+              setParticles(prev => [...prev.slice(-20), { // Limit particles for performance
                 id: `trail-${Date.now()}-${Math.random()}`,
                 x,
                 y,
@@ -122,9 +126,11 @@ export const CyberChart = ({
               }]);
             }
           }
+          
+          return newData.slice(-500); // Keep last 500 points for performance
         }
         
-        return newData.slice(-1000);
+        return prev;
       });
     }
   }, [currentMultiplier, isActive, isCrashed, startTime]);
@@ -179,6 +185,8 @@ export const CyberChart = ({
     const padding = 40;
     const chartWidth = rect.width - (padding * 2);
     const chartHeight = rect.height - (padding * 2);
+
+    if (chartData.length < 2) return; // Need at least 2 points to draw
 
     const maxTime = Math.max(...chartData.map(p => p.time));
     const maxMultiplier = Math.max(2.0, Math.max(...chartData.map(p => p.multiplier)) * 1.1);
@@ -242,7 +250,7 @@ export const CyberChart = ({
         gradient.addColorStop(1, 'hsl(180, 100%, 30%)');
       }
       
-      // Generate smooth curve points
+      // Generate smooth curve points with proper scaling
       const curvePoints = [];
       for (let i = 0; i < chartData.length; i++) {
         const point = chartData[i];
@@ -251,22 +259,32 @@ export const CyberChart = ({
         curvePoints.push({ x, y });
       }
       
-      // Draw smooth Bezier curve
+      // Draw ultra-smooth Bezier curve
       ctx.beginPath();
       if (curvePoints.length > 0) {
         ctx.moveTo(curvePoints[0].x, curvePoints[0].y);
         
-        for (let i = 1; i < curvePoints.length; i++) {
-          if (i === 1) {
-            ctx.lineTo(curvePoints[i].x, curvePoints[i].y);
-          } else {
-            // Create smooth curves using quadratic Bezier
-            const prevPoint = curvePoints[i - 1];
-            const currentPoint = curvePoints[i];
-            const controlX = (prevPoint.x + currentPoint.x) / 2;
-            const controlY = (prevPoint.y + currentPoint.y) / 2;
+        if (curvePoints.length === 2) {
+          ctx.lineTo(curvePoints[1].x, curvePoints[1].y);
+        } else {
+          // Use cubic Bezier for ultra-smooth curves
+          for (let i = 1; i < curvePoints.length - 1; i++) {
+            const current = curvePoints[i];
+            const next = curvePoints[i + 1];
+            const controlPoint1 = {
+              x: current.x + (next.x - current.x) * 0.3,
+              y: current.y
+            };
+            const controlPoint2 = {
+              x: next.x - (next.x - current.x) * 0.3,
+              y: next.y
+            };
             
-            ctx.quadraticCurveTo(controlX, controlY, currentPoint.x, currentPoint.y);
+            ctx.bezierCurveTo(
+              controlPoint1.x, controlPoint1.y,
+              controlPoint2.x, controlPoint2.y,
+              next.x, next.y
+            );
           }
         }
       }
