@@ -130,6 +130,30 @@ export default {
           "0%, 100%": { boxShadow: "0 0 0 0 hsl(var(--destructive) / 0.4)" },
           "70%": { boxShadow: "0 0 0 10px hsl(var(--destructive) / 0)" },
         },
+        "screenShake": {
+          "0%, 100%": { transform: "translateX(0)" },
+          "10%, 30%, 50%, 70%, 90%": { transform: "translateX(-5px)" },
+          "20%, 40%, 60%, 80%": { transform: "translateX(5px)" }
+        },
+        "multiplierRise": {
+          "0%": { 
+            transform: "scale(1)",
+            color: "hsl(var(--neon-cyan))"
+          },
+          "50%": { 
+            transform: "scale(1.1)",
+            color: "hsl(60, 100%, 50%)"
+          },
+          "100%": { 
+            transform: "scale(1)",
+            color: "hsl(var(--neon-red))"
+          }
+        },
+        "chartGlow": {
+          "0%": { filter: "drop-shadow(0 0 5px hsl(var(--neon-cyan)))" },
+          "50%": { filter: "drop-shadow(0 0 15px hsl(var(--neon-cyan)))" },
+          "100%": { filter: "drop-shadow(0 0 5px hsl(var(--neon-cyan)))" }
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -140,6 +164,9 @@ export default {
         "value-change": "value-change 0.3s ease-out",
         "pulse-success": "pulse-success 2s infinite",
         "pulse-danger": "pulse-danger 2s infinite",
+        "screen-shake": "screenShake 0.5s linear",
+        "multiplier-rise": "multiplierRise 1s ease-in-out",
+        "chart-glow": "chartGlow 2s ease-in-out infinite",
       },
     },
   },

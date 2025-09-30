@@ -152,6 +152,18 @@
   .neon-glow-purple { box-shadow: var(--glow-purple); }
   .neon-glow-green { box-shadow: var(--glow-green); }
   .neon-glow-red { box-shadow: var(--glow-red); }
+
+  /* Advanced chart animations */
+  .crash-chart {
+    animation: chartGlow 2s ease-in-out infinite;
+    transition: all 0.3s ease;
+  }
+
+  .multiplier-display {
+    font-family: 'Space Grotesk', 'Courier New', monospace;
+    font-weight: bold;
+    transition: color 0.3s ease, transform 0.2s ease;
+  }
   
   /* Gradients */
   .gradient-neon-primary { background: var(--gradient-neon-primary); }

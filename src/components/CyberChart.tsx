@@ -158,10 +158,10 @@ export const CyberChart = ({
     };
   }, [updateParticles]);
 
-  // Main chart rendering
+  // Professional chart rendering with smooth curves
   const renderChart = useCallback(() => {
     const canvas = canvasRef.current;
-    if (!canvas || chartData.length < 2) return;
+    if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -223,10 +223,11 @@ export const CyberChart = ({
       ctx.fillText(`${(time/1000).toFixed(0)}s`, x, padding + chartHeight + 20);
     }
 
-    // Chart line with dynamic color
+    // Professional smooth curve with Bezier interpolation
     if (chartData.length > 1) {
       const gradient = ctx.createLinearGradient(0, padding, 0, padding + chartHeight);
       
+      // Dynamic gradient based on multiplier
       if (isCrashed) {
         gradient.addColorStop(0, 'hsl(0, 100%, 50%)');
         gradient.addColorStop(1, 'hsl(0, 100%, 30%)');
@@ -241,30 +242,55 @@ export const CyberChart = ({
         gradient.addColorStop(1, 'hsl(180, 100%, 30%)');
       }
       
-      ctx.beginPath();
-      
-      chartData.forEach((point, index) => {
+      // Generate smooth curve points
+      const curvePoints = [];
+      for (let i = 0; i < chartData.length; i++) {
+        const point = chartData[i];
         const x = padding + (point.time / Math.max(1, maxTime)) * chartWidth;
         const y = padding + chartHeight - ((point.multiplier - minMultiplier) / Math.max(0.001, (maxMultiplier - minMultiplier))) * chartHeight;
+        curvePoints.push({ x, y });
+      }
+      
+      // Draw smooth Bezier curve
+      ctx.beginPath();
+      if (curvePoints.length > 0) {
+        ctx.moveTo(curvePoints[0].x, curvePoints[0].y);
         
-        if (index === 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
+        for (let i = 1; i < curvePoints.length; i++) {
+          if (i === 1) {
+            ctx.lineTo(curvePoints[i].x, curvePoints[i].y);
+          } else {
+            // Create smooth curves using quadratic Bezier
+            const prevPoint = curvePoints[i - 1];
+            const currentPoint = curvePoints[i];
+            const controlX = (prevPoint.x + currentPoint.x) / 2;
+            const controlY = (prevPoint.y + currentPoint.y) / 2;
+            
+            ctx.quadraticCurveTo(controlX, controlY, currentPoint.x, currentPoint.y);
+          }
         }
-      });
+      }
 
-      // Line stroke with glow effect
+      // Enhanced line rendering with multiple glow layers
       ctx.strokeStyle = gradient;
-      ctx.lineWidth = 4;
+      ctx.lineWidth = 6;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
+      
+      // Outer glow
       ctx.shadowColor = isCrashed ? 'hsl(0, 100%, 50%)' : 'hsl(180, 100%, 50%)';
-      ctx.shadowBlur = 20;
+      ctx.shadowBlur = 25;
       ctx.stroke();
       
-      // Reset shadow
+      // Inner glow
+      ctx.shadowBlur = 15;
+      ctx.lineWidth = 4;
+      ctx.stroke();
+      
+      // Core line
       ctx.shadowBlur = 0;
+      ctx.lineWidth = 2;
+      ctx.stroke();
 
       // Area fill
       if (!isCrashed) {
@@ -382,7 +408,7 @@ export const CyberChart = ({
   };
 
   return (
-    <Card className={`relative h-[600px] p-6 glass-elevated overflow-hidden ${shake ? 'animate-screen-shake' : ''}`}>
+    <Card className={`relative h-[600px] p-6 glass-elevated overflow-hidden crash-chart ${shake ? 'animate-screen-shake' : ''}`} id="game-container">
       {/* Cyberpunk Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
@@ -403,10 +429,10 @@ export const CyberChart = ({
             <div className="text-xs text-muted-foreground uppercase tracking-wide font-mono">
               MULTIPLIER
             </div>
-            <div className={`text-3xl font-display font-bold number-mono ${
-              isCrashed ? 'text-neon-red animate-neon-flicker' : 
-              isActive ? 'text-neon-cyan' : 'text-muted-foreground'
-            } ${isActive ? 'animate-value-pump' : ''}`}>
+            <div className={`text-3xl font-display font-bold number-mono multiplier-display ${
+              isCrashed ? 'text-neon-red animate-neon-flicker animate-screen-shake' : 
+              isActive ? 'text-neon-cyan animate-multiplier-rise' : 'text-muted-foreground'
+            }`}>
               {currentMultiplier.toFixed(2)}×
             </div>
           </div>
